@@ -1,0 +1,49 @@
+---
+/**
+ * DoshaEffectChips, one chip per dosha showing the entry's effect.
+ * `short` renders the compact card form ("vāta +"); the default renders the
+ * full phrase for detail pages. A legend near the chips decodes the symbols.
+ */
+import { DOSHAS, doshaLabel, effectPhrase, effectSymbol } from '../lib/domain';
+import type { DoshaEffect, DoshaEffects } from '../lib/domain';
+
+interface Props {
+  effects: DoshaEffects;
+  short?: boolean;
+}
+
+const { effects, short = false } = Astro.props;
+
+const effectClasses: Record<DoshaEffect, string> = {
+  balancing: 'bg-sage/15 text-sage-deep',
+  neutral: 'bg-sand/40 text-clay',
+  aggravating: 'bg-plum/15 text-plum-deep',
+};
+---
+
+<ul class:list={['flex flex-wrap gap-1.5', short ? 'text-xs' : 'text-sm']} aria-label="Dosha effects">
+  {
+    DOSHAS.map((dosha) => {
+      const effect = effects[dosha];
+      return (
+        <li>
+          {short ? (
+            <span
+              class:list={['inline-flex items-center rounded-full px-2 py-0.5 font-medium', effectClasses[effect]]}
+              title={effectPhrase[effect](doshaLabel[dosha])}
+            >
+              {doshaLabel[dosha]} <span aria-hidden="true">&nbsp;{effectSymbol[effect]}</span>
+              <span class="sr-only">,  {effectPhrase[effect](doshaLabel[dosha])}</span>
+            </span>
+          ) : (
+            <span
+              class:list={['inline-flex items-center rounded-full px-3 py-1 font-medium', effectClasses[effect]]}
+            >
+              {effectPhrase[effect](doshaLabel[dosha])}
+            </span>
+          )}
+        </li>
+      );
+    })
+  }
+</ul>

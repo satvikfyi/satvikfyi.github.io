@@ -1,0 +1,55 @@
+---
+/**
+ * Disclaimer, mandatory safety note rendered on ayurveda, recipe, yoga and
+ * pranayama content. Variants select the wording; `compact` renders a
+ * one-liner suitable inside cards and listings.
+ */
+interface Props {
+  variant?: 'ayurveda' | 'yoga' | 'pranayama' | 'general';
+  compact?: boolean;
+}
+
+const { variant = 'general', compact = false } = Astro.props;
+
+const compactText: Record<string, string> = {
+  ayurveda: 'Traditional information, not medical advice; consult a qualified practitioner.',
+  yoga: 'Practice guidance, not medical advice; respect your limits and seek a qualified teacher.',
+  pranayama: 'Breathwork can be powerful, learn advanced techniques from a qualified teacher.',
+  general: 'Educational information from traditional sources, not professional advice.',
+};
+
+const fullText: Record<string, string[]> = {
+  ayurveda: [
+    'Ayurvedic knowledge on this site is shared for educational purposes and reflects traditional sources, which are cited where used.',
+    'It is not medical advice. Ayurvedic herbs and preparations can interact with medical conditions, medications and pregnancy. Consult a qualified practitioner or physician before changing your diet, herbs or treatment.',
+  ],
+  yoga: [
+    'Asana instructions on this site are educational and drawn from cited traditional or modern sources.',
+    'They are not medical advice. Practice within your limits, adapt with props or a teacher\u2019s guidance, and consult a physician if you are pregnant or managing an injury or health condition.',
+  ],
+  pranayama: [
+    'Pranayama is a powerful practice traditionally learned under a teacher\u2019s supervision.',
+    'If you are pregnant, or live with a cardiac, respiratory or mental-health condition, consult a qualified teacher and a physician before practicing. Never strain the breath; stop if you feel dizzy or unwell.',
+  ],
+  general: [
+    'Satvik.fyi shares traditional wisdom for educational purposes, distinguishing scripture and classical sources from modern interpretation.',
+    'Nothing on this site is professional medical, psychological or spiritual advice.',
+  ],
+};
+
+const title: Record<string, string> = {
+  ayurveda: 'Ayurveda disclaimer',
+  yoga: 'Yoga practice disclaimer',
+  pranayama: 'Pranayama safety note',
+  general: 'Educational disclaimer',
+};
+---
+
+<aside
+  role="note"
+  aria-label={title[variant]}
+  class="rounded-xl border border-sand bg-parchment p-4 text-sm leading-relaxed text-clay"
+>
+  <p class="mb-1 font-semibold text-earth">{title[variant]}</p>
+  {compact ? <p>{compactText[variant]}</p> : fullText[variant].map((paragraph) => <p class="mb-2 last:mb-0">{paragraph}</p>)}
+</aside>

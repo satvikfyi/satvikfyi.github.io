@@ -1,0 +1,33 @@
+{
+  "name": "satvik-fyi",
+  "version": "0.1.0",
+  "description": "Satvik.fyi — a non-profit, static, modular wellness site based on ancient Indian wisdom. Phase 0: modular scaffold.",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=18.17.1"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "check:links": "node scripts/check-links.mjs",
+    "check:search": "node scripts/check-search-index.mjs",
+    "check:seo": "node scripts/check-seo.mjs",
+    "verify": "npm run check && npm run build && npm run check:links && npm run check:search && npm run check:seo"
+  },
+  "dependencies": {
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.2.0",
+    "@tailwindcss/typography": "^0.5.15",
+    "@tailwindcss/vite": "^4.0.0",
+    "astro": "^5.0.0",
+    "fuse.js": "^7.5.0",
+    "tailwindcss": "^4.0.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.5.0"
+  }
+}

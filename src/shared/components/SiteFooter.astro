@@ -1,0 +1,127 @@
+---
+/**
+ * SiteFooter, everything that is NOT a pillar: static pages, enabled
+ * modules grouped by pillar (registry-driven), and the Shop / Community /
+ * Newsletter placeholders. Zero client JS.
+ */
+import { SITE } from '../../config/site';
+import { enabledModules, pillars } from '../../config/sections';
+
+const year = new Date().getFullYear();
+
+const sitePages = [
+  { label: 'About', href: '/about/' },
+  { label: 'Contact', href: '/contact/' },
+  { label: 'Privacy', href: '/privacy/' },
+  { label: 'Disclaimer', href: '/disclaimer/' },
+];
+
+// Sitewide modules (parent: null) live in the footer per the nav rule, 
+// the navbar shows only the three pillars.
+const sitewideModules = enabledModules(null);
+---
+
+<footer class="border-t border-sand bg-parchment/60">
+  <div class="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 py-12 sm:grid-cols-2 sm:px-6 lg:grid-cols-4">
+    <div>
+      <p class="font-display text-lg font-bold text-earth">Satvik<span class="text-saffron-deep">.fyi</span></p>
+      <p class="mt-3 text-sm leading-relaxed text-clay">
+        A non-profit introduction to satvik living, body, mind and soul; built with respect for the
+        traditions and their sources.
+      </p>
+    </div>
+
+    <nav aria-label="Explore">
+      <h2 class="text-sm font-semibold tracking-wide text-earth uppercase">Explore</h2>
+      <ul class="mt-3 space-y-2">
+        {
+          pillars.map((pillar) => {
+            const modules = enabledModules(pillar.id);
+            return (
+              <li>
+                <a href={pillar.routePrefix} class="text-sm font-medium text-earth hover:text-saffron-deep hover:underline">
+                  {pillar.title}
+                </a>
+                {modules.length > 0 && (
+                  <ul class="mt-1 ml-4 space-y-1">
+                    {modules.map((module) => (
+                      <li>
+                        <a href={module.routePrefix} class="text-sm text-clay hover:text-saffron-deep hover:underline">
+                          {module.title}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <nav aria-label="Site">
+      <h2 class="text-sm font-semibold tracking-wide text-earth uppercase">Site</h2>
+      <ul class="mt-3 space-y-2">
+        {
+          sitePages.map((page) => (
+            <li>
+              <a href={page.href} class="text-sm text-clay hover:text-saffron-deep hover:underline">
+                {page.label}
+              </a>
+            </li>
+          ))
+        }
+        {
+          sitewideModules.map((module) => (
+            <li>
+              <a href={module.routePrefix} class="text-sm text-clay hover:text-saffron-deep hover:underline">
+                {module.title}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+
+    <nav aria-label="Elsewhere">
+      <h2 class="text-sm font-semibold tracking-wide text-earth uppercase">Elsewhere</h2>
+      <ul class="mt-3 space-y-2">
+        {
+          SITE.footer.elsewhere.map((link) => (
+            <li class="text-sm text-clay">
+              {link.href ? (
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-clay hover:text-saffron-deep hover:underline"
+                >
+                  {link.label}
+                  <span class="sr-only">(opens in a new tab)</span>
+                </a>
+              ) : (
+                <span>
+                  {link.label} <span class="text-xs tracking-wide uppercase">,  coming soon</span>
+                </span>
+              )}
+            </li>
+          ))
+        }
+      </ul>
+    </nav>
+  </div>
+
+  <div class="border-t border-sand">
+    <div class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-6 text-xs leading-relaxed text-clay sm:flex-row sm:items-center sm:justify-between sm:px-6">
+      <p>
+        © {year} Satvik.fyi · Non-profit · Content licensed under {SITE.contentLicense} where
+        original.
+      </p>
+      <p>
+        Educational information from traditional sources, not medical advice.
+        <a href="/disclaimer/" class="underline hover:text-saffron-deep">Read the full disclaimer</a>.
+      </p>
+    </div>
+  </div>
+</footer>

@@ -1,0 +1,44 @@
+---
+/**
+ * PostCard, a listing entry for the blog listing and tag pages. Tags link
+ * to their tag pages.
+ */
+import type { Post } from '../schemas/post';
+import { formatDate, tagHref } from '../lib/domain';
+
+interface Props {
+  post: Post;
+}
+
+const { post } = Astro.props;
+const href = `/blog/${post.slug}/`;
+---
+
+<li
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-sage/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <p class="text-xs font-semibold tracking-wide text-sage-deep uppercase">
+    <time datetime={post.date}>{formatDate(post.date)}</time>
+  </p>
+  <h3 class="mt-2 font-display text-xl leading-snug font-semibold text-earth">
+    <a href={href} class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2">
+      {post.title}
+    </a>
+  </h3>
+  <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-clay">{post.excerpt}</p>
+  <ul role="list" class="mt-4 flex flex-wrap gap-2" aria-label="Tags">
+    {
+      post.tags.map((tag) => (
+        <li>
+          <a
+            href={tagHref(tag)}
+            class="inline-flex items-center rounded-full bg-sage/15 px-2.5 py-0.5 text-xs font-medium text-sage-deep hover:bg-sage/25"
+          >
+            #{tag}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-auto pt-4 text-xs font-medium tracking-wide text-clay uppercase">{post.author}</p>
+</li>

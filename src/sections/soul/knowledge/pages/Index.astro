@@ -1,0 +1,96 @@
+---
+/**
+ * Gyan Yoga overview, the path of knowledge, with its Upaniṣadic verses
+ * from the shared soul-teachings collection. Routed via
+ * src/pages/soul/knowledge/index.astro (thin wrapper).
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import TeachingArticle from '../../paths/components/TeachingArticle.astro';
+import SiblingPaths from '../../paths/components/SiblingPaths.astro';
+import config from '../module.config';
+
+const teachings = (await getCollection('soul-teachings'))
+  .filter((entry) => entry.data.path === 'knowledge')
+  .sort((a, b) => a.data.reference.localeCompare(b.data.reference, 'en'));
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Gyan Yoga, the path of knowledge"
+  eyebrow="Soul · Knowledge"
+  lede="Not information but seeing through: gyan (jñāna) yoga is the discipline of discerning what truly is, behind names, behind the body, behind the mind's every claim about who you are."
+  path={config.routePrefix}
+  accent="plum"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Soul', path: '/soul/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="space-y-10 lg:col-span-2">
+      <section aria-labelledby="essence-heading" class="space-y-4">
+        <h2 id="essence-heading" class="font-display text-2xl font-bold text-earth">The essence</h2>
+        <p class="leading-relaxed text-clay">
+          The Upaniṣads, the forest conversations at the end of the Vedas; report a discovery: that
+          the self you are looking with and the reality you are looking at are not two. Gyan yoga is
+          the long, honest making-room for that discovery, classically through three movements:
+          <strong class="font-semibold text-earth">śravaṇa</strong> (hearing the truth),
+          <strong class="font-semibold text-earth">manana</strong> (thinking it through to its edges)
+          and <strong class="font-semibold text-earth">nididhyāsana</strong> (dwelling on it until it
+          is no longer an opinion).
+        </p>
+        <p class="leading-relaxed text-clay">
+          Its tools are the simplest and hardest in the tradition: viveka, discernment between the
+          real and the apparently real, and vairāgya, the dispassion that comes from seeing clearly
+          rather than from forcing oneself.
+        </p>
+      </section>
+
+      <section aria-labelledby="practice-heading" class="space-y-4">
+        <h2 id="practice-heading" class="font-display text-2xl font-bold text-earth">The path in practice</h2>
+        <ul role="list" class="grid grid-cols-1 gap-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2">
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Read the Upaniṣads slowly, one passage a week, sat with, beats a chapter a day.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Ask of each mood and thought: to whom is this appearing?, and wait.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Distinguish daily between "I am tired" and "tiredness is present", viveka, in miniature.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Study with a text or teacher; the tradition insists knowledge is conversational.</span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="teachings-heading" class="space-y-5">
+        <h2 id="teachings-heading" class="font-display text-2xl font-bold text-earth">From the tradition</h2>
+        {teachings.map((entry) => <TeachingArticle entry={entry} />)}
+      </section>
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <SiblingPaths current="knowledge" />
+      {isModuleEnabled('meditation') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">The witness, in practice</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            The mind pillar carries the sitting practices that gyan rests on, sākṣī-bhāva, the witness
+            attitude, is the bridge between reading and seeing.
+          </p>
+          <a
+            href="/mind/meditation/sakshi-bhava/"
+            class="mt-4 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep"
+          >
+            The witness attitude →
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</PageLayout>

@@ -1,0 +1,179 @@
+---
+/**
+ * Mantra detail, the text as the visual centrepiece: Devanāgarī large,
+ * IAST beneath it, then meaning, meter, usage, optional video embed and
+ * sources. Routed via src/pages/mind/mantras/[slug].astro (thin wrapper).
+ */
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import Tag from '../../../../shared/components/Tag.astro';
+import ExternalLink from '../../../../shared/components/ExternalLink.astro';
+import YouTubeEmbed from '../../../../shared/components/YouTubeEmbed.astro';
+import { breadcrumbJsonLd, articleJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import config from '../module.config';
+import { categoryLabel, youtubeId } from '../lib/domain';
+
+export async function getStaticPaths() {
+  if (!isModuleEnabled('mantras')) return [];
+  const entries = await getCollection('mantras');
+  return entries.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'mantras'>;
+}
+
+const { entry } = Astro.props;
+const mantra = entry.data;
+const { Content } = await render(entry);
+const hasBody = typeof entry.body === 'string' && entry.body.trim().length > 0;
+const path = `/mind/mantras/${mantra.slug}/`;
+const video = mantra.videoUrl ? youtubeId(mantra.videoUrl) : null;
+---
+
+<PageLayout
+  title={mantra.name}
+  description={mantra.summary}
+  heading={mantra.name}
+  eyebrow={`Mind · Mantras · ${categoryLabel[mantra.category]}`}
+  path={path}
+  type="article"
+  accent="indigo"
+  jsonLd={[
+    articleJsonLd({
+      siteName: SITE.name,
+      siteUrl: SITE.url,
+      title: mantra.name,
+      description: mantra.summary,
+      path,
+    }),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Mind', path: '/mind/' },
+      { name: config.title, path: config.routePrefix },
+      { name: mantra.name, path },
+    ]),
+  ]}
+>
+  <nav aria-label="Breadcrumb" class="mb-6">
+    <ol class="flex flex-wrap items-center gap-2 text-sm text-clay">
+      <li><a href="/" class="hover:text-saffron-deep hover:underline">Home</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/mind/" class="hover:text-saffron-deep hover:underline">Mind</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/mind/mantras/" class="hover:text-saffron-deep hover:underline">Mantras</a></li>
+      <li aria-hidden="true">/</li>
+      <li aria-current="page" class="font-medium text-earth">{mantra.name}</li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+    <article class="lg:col-span-2">
+      <p class="text-lg leading-relaxed text-clay">{mantra.summary}</p>
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <Tag label={mantra.deity} accent="indigo" />
+        <Tag label={mantra.tradition} />
+        <Tag label={categoryLabel[mantra.category]} accent="sage" />
+      </div>
+
+      <section aria-labelledby="text-heading" class="mt-10">
+        <h2 id="text-heading" class="font-display text-2xl font-bold text-earth">The mantra</h2>
+        <div class="mt-4 rounded-2xl border border-sand bg-parchment/60 p-8 text-center">
+          <p lang="sa" class="font-display text-2xl leading-loose font-semibold text-earth sm:text-3xl">
+            {mantra.text}
+          </p>
+          <p class="mx-auto mt-6 max-w-xl text-base leading-relaxed text-clay italic">
+            {mantra.transliteration}
+          </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="meaning-heading" class="mt-10">
+        <h2 id="meaning-heading" class="font-display text-2xl font-bold text-earth">Meaning</h2>
+        <p class="mt-4 rounded-2xl border border-sand bg-parchment/60 p-6 text-sm leading-relaxed text-earth">
+          {mantra.meaning}
+        </p>
+      </section>
+
+      {
+        video && (
+          <section aria-labelledby="video-heading" class="mt-10">
+            <h2 id="video-heading" class="font-display text-2xl font-bold text-earth">Listen, a free rendition</h2>
+            <p class="mt-2 mb-4 text-sm leading-relaxed text-clay">
+              A free recording to chant along with, loaded only when you scroll to it, via YouTube's
+              privacy-enhanced player.
+            </p>
+            <YouTubeEmbed videoId={video} title={`${mantra.name}, free rendition`} />
+          </section>
+        )
+      }
+
+      {
+        hasBody && (
+          <section aria-labelledby="tradition-heading" class="mt-10">
+            <h2 id="tradition-heading" class="font-display text-2xl font-bold text-earth">In the tradition</h2>
+            <div class="prose prose-earth mt-4 max-w-none prose-headings:font-display prose-a:text-saffron-deep">
+              <Content />
+            </div>
+          </section>
+        )
+      }
+
+      {
+        mantra.sources.length > 0 && (
+          <section aria-labelledby="sources-heading" class="mt-10">
+            <h2 id="sources-heading" class="font-display text-2xl font-bold text-earth">Sources &amp; further reading</h2>
+            <ul role="list" class="mt-4 space-y-2 text-sm leading-relaxed text-clay">
+              {mantra.sources.map((source) => (
+                <li class="flex gap-2">
+                  <span aria-hidden="true" class="mt-0.5 text-indigo-deep">◆</span>
+                  <span>
+                    {source.url ? (
+                      <ExternalLink href={source.url} class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2">
+                        {source.title}
+                      </ExternalLink>
+                    ) : (
+                      <span class="font-medium text-earth">{source.title}</span>
+                    )}
+                    {source.author && <span>, {source.author}</span>}
+                    {source.reference && <span class="italic"> ({source.reference})</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <div class="mt-10">
+        <Disclaimer variant="general" />
+      </div>
+    </article>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Meter</h2>
+        <p class="mt-3 text-sm leading-relaxed text-earth">{mantra.meter}</p>
+      </div>
+
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Traditional usage</h2>
+        <p class="mt-3 text-sm leading-relaxed text-clay">{mantra.usage}</p>
+      </div>
+
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Keep chanting</h2>
+        <a href="/mind/mantras/" class="mt-3 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep">
+          The whole collection →
+        </a>
+      </div>
+    </aside>
+  </div>
+</PageLayout>

@@ -1,0 +1,75 @@
+---
+/**
+ * ArticleLayout, long-form reading page (blog posts, wiki entries, recipe
+ * notes) with typographic prose via @tailwindcss/typography.
+ */
+import BaseLayout from './BaseLayout.astro';
+import PageHeader from '../components/PageHeader.astro';
+import Tag from '../components/Tag.astro';
+import type { JsonLdObject } from '../seo/jsonld';
+
+interface Props {
+  title: string;
+  description?: string;
+  path: string;
+  eyebrow?: string;
+  /** ISO 8601 publication date. */
+  datePublished?: string;
+  dateModified?: string;
+  tags?: string[];
+  /** When set, tags render as links to `{tagLinkPrefix}{tag}/`. */
+  tagLinkPrefix?: string;
+  /** Absolute social-share image URL, passed through to the head. */
+  image?: string;
+  jsonLd?: JsonLdObject[];
+}
+
+const { title, description, path, eyebrow, datePublished, dateModified, tags = [], tagLinkPrefix, image, jsonLd = [] } =
+  Astro.props;
+
+const formatDate = (iso?: string) =>
+  iso
+    ? new Date(iso).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' })
+    : null;
+---
+
+<BaseLayout title={title} description={description} path={path} type="article" jsonLd={jsonLd} image={image}>
+  <div class="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
+    <PageHeader eyebrow={eyebrow} title={title} description={description} />
+    {
+      (datePublished || tags.length > 0) && (
+        <div class="mb-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-clay">
+          {datePublished && (
+            <time datetime={datePublished}>
+              Published {formatDate(datePublished)}
+              {dateModified && dateModified !== datePublished
+                ? ` · Updated ${formatDate(dateModified)}`
+                : ''}
+            </time>
+          )}
+          {tags.length > 0 && (
+            <ul class="flex flex-wrap gap-2" aria-label="Tags">
+              {tags.map((tag) => (
+                <li>
+                  {tagLinkPrefix ? (
+                    <a
+                      href={`${tagLinkPrefix}${tag}/`}
+                      class="inline-flex items-center rounded-full bg-sage/15 px-2.5 py-0.5 text-xs font-medium text-sage-deep hover:bg-sage/25"
+                    >
+                      #{tag}
+                    </a>
+                  ) : (
+                    <Tag label={tag} />
+                  )}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      )
+    }
+    <article class="prose prose-earth max-w-none prose-headings:font-display prose-a:text-saffron-deep prose-a:underline prose-a:decoration-saffron/60 prose-a:underline-offset-2 hover:prose-a:decoration-saffron-deep">
+      <slot />
+    </article>
+  </div>
+</BaseLayout>

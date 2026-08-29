@@ -1,0 +1,94 @@
+---
+/**
+ * Bhakti Yoga overview, the path of devotion, with verses from the Gītā
+ * and Nārada from the shared soul-teachings collection. Routed via
+ * src/pages/soul/devotion/index.astro (thin wrapper).
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import TeachingArticle from '../../paths/components/TeachingArticle.astro';
+import SiblingPaths from '../../paths/components/SiblingPaths.astro';
+import config from '../module.config';
+
+const teachings = (await getCollection('soul-teachings'))
+  .filter((entry) => entry.data.path === 'devotion')
+  .sort((a, b) => a.data.reference.localeCompare(b.data.reference, 'en'));
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Bhakti Yoga, the path of devotion"
+  eyebrow="Soul · Devotion"
+  lede="The oldest path and the most democratic: love, aimed at the divine, until the lover and the beloved begin to trade places. Bhakti asks for no scholarship, no posture, no qualification; only a heart willing to be pointed."
+  path={config.routePrefix}
+  accent="plum"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Soul', path: '/soul/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="space-y-10 lg:col-span-2">
+      <section aria-labelledby="essence-heading" class="space-y-4">
+        <h2 id="essence-heading" class="font-display text-2xl font-bold text-earth">The essence</h2>
+        <p class="leading-relaxed text-clay">
+          Where gyan discerns and karma acts, bhakti relates. The tradition's saints, the Āḻvārs and
+          Nāyanmārs of the south, Mirabai, Tulsidās, Chaitanya, the Sikh Gurūs; left a literature
+          that is simply love letters with metaphysics folded inside. The Bhakti Sūtras define the
+          state precisely: <em>parama-prema</em>, supreme love, wanting nothing in return.
+        </p>
+        <p class="leading-relaxed text-clay">
+          Its signature practice is the easiest to begin in all of yoga: <strong class="font-semibold text-earth">kīrtana</strong>,
+          singing the names together, and <strong class="font-semibold text-earth">japa</strong>,
+          repeating them alone. The mind that will not sit still for philosophy will often sing for an
+          hour without noticing time.
+        </p>
+      </section>
+
+      <section aria-labelledby="practice-heading" class="space-y-4">
+        <h2 id="practice-heading" class="font-display text-2xl font-bold text-earth">The path in practice</h2>
+        <ul role="list" class="grid grid-cols-1 gap-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2">
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Choose a name or form that draws the heart, or let one choose you.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Sing it (kīrtana) with others when possible; repetition alone is the daily bread.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Read the bhakti poets, their love is instruction wearing a story.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Offer the day's first and last moments, a flower, a lamp, a verse, a breath.</span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="teachings-heading" class="space-y-5">
+        <h2 id="teachings-heading" class="font-display text-2xl font-bold text-earth">From the tradition</h2>
+        {teachings.map((entry) => <TeachingArticle entry={entry} />)}
+      </section>
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <SiblingPaths current="devotion" />
+      {isModuleEnabled('mantras') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Names to sing</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            The mantra database carries the great devotional names, the mahā-mantra, the
+            Pañcākṣara, the Gāyatrī; with text, transliteration and recordings.
+          </p>
+          <a
+            href="/mind/mantras/"
+            class="mt-4 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep"
+          >
+            The mantra collection →
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</PageLayout>

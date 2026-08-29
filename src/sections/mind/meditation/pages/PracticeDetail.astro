@@ -1,0 +1,194 @@
+---
+/**
+ * Meditation detail, steps ("how to practise" or "how to explore"),
+ * effects, precautions, duration guidance, sources. Quiet page, zero client
+ * JS. Routed via src/pages/mind/meditation/[slug].astro (thin wrapper).
+ */
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import Tag from '../../../../shared/components/Tag.astro';
+import ExternalLink from '../../../../shared/components/ExternalLink.astro';
+import { breadcrumbJsonLd, articleJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import config from '../module.config';
+import { kindLabel } from '../lib/domain';
+
+export async function getStaticPaths() {
+  if (!isModuleEnabled('meditation')) return [];
+  const entries = await getCollection('meditation-practices');
+  return entries.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'meditation-practices'>;
+}
+
+const { entry } = Astro.props;
+const practice = entry.data;
+const { Content } = await render(entry);
+const hasBody = typeof entry.body === 'string' && entry.body.trim().length > 0;
+const path = `/mind/meditation/${practice.slug}/`;
+---
+
+<PageLayout
+  title={practice.sanskritName ? `${practice.name} (${practice.sanskritName})` : practice.name}
+  description={practice.summary}
+  heading={practice.name}
+  eyebrow={`Mind · Meditation · ${kindLabel[practice.kind]}`}
+  path={path}
+  type="article"
+  accent="indigo"
+  jsonLd={[
+    articleJsonLd({
+      siteName: SITE.name,
+      siteUrl: SITE.url,
+      title: practice.sanskritName ? `${practice.name} (${practice.sanskritName})` : practice.name,
+      description: practice.summary,
+      path,
+    }),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Mind', path: '/mind/' },
+      { name: config.title, path: config.routePrefix },
+      { name: practice.name, path },
+    ]),
+  ]}
+>
+  <nav aria-label="Breadcrumb" class="mb-6">
+    <ol class="flex flex-wrap items-center gap-2 text-sm text-clay">
+      <li><a href="/" class="hover:text-saffron-deep hover:underline">Home</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/mind/" class="hover:text-saffron-deep hover:underline">Mind</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/mind/meditation/" class="hover:text-saffron-deep hover:underline">Meditation</a></li>
+      <li aria-hidden="true">/</li>
+      <li aria-current="page" class="font-medium text-earth">{practice.name}</li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+    <article class="lg:col-span-2">
+      {practice.sanskritName && <p class="font-display text-xl text-clay italic">{practice.sanskritName}</p>}
+      <p class="mt-4 text-lg leading-relaxed text-clay">{practice.summary}</p>
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <Tag label={kindLabel[practice.kind]} accent="indigo" />
+        <Tag label={practice.tradition} />
+      </div>
+
+      <section aria-labelledby="steps-heading" class="mt-10">
+        <h2 id="steps-heading" class="font-display text-2xl font-bold text-earth">
+          {practice.kind === 'practice' ? 'How to practise' : 'How to explore it'}
+        </h2>
+        <ol role="list" class="mt-4 space-y-4">
+          {
+            practice.steps.map((step, index) => (
+              <li class="flex gap-4">
+                <span
+                  aria-hidden="true"
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo/15 text-sm font-bold text-indigo-deep"
+                >
+                  {index + 1}
+                </span>
+                <p class="text-sm leading-relaxed text-earth">{step}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section aria-labelledby="effects-heading" class="mt-10">
+        <h2 id="effects-heading" class="font-display text-2xl font-bold text-earth">Effects &amp; fruits</h2>
+        <ul role="list" class="mt-4 grid grid-cols-1 gap-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2">
+          {
+            practice.effects.map((effect) => (
+              <li class="flex gap-2 text-sm leading-relaxed text-earth">
+                <span aria-hidden="true" class="mt-0.5 text-sage-deep">◆</span>
+                <span>{effect}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      {
+        practice.precautions.length > 0 && (
+          <section aria-labelledby="precautions-heading" class="mt-10">
+            <h2 id="precautions-heading" class="font-display text-2xl font-bold text-earth">Precautions</h2>
+            <ul role="list" class="mt-4 space-y-2 rounded-2xl border border-plum/30 bg-plum/5 p-6">
+              {practice.precautions.map((precaution) => (
+                <li class="flex gap-2 text-sm leading-relaxed text-earth">
+                  <span aria-hidden="true" class="mt-0.5 font-bold text-plum-deep">!</span>
+                  <span>{precaution}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      {
+        hasBody && (
+          <section aria-labelledby="tradition-heading" class="mt-10">
+            <h2 id="tradition-heading" class="font-display text-2xl font-bold text-earth">In the tradition</h2>
+            <div class="prose prose-earth mt-4 max-w-none prose-headings:font-display prose-a:text-saffron-deep">
+              <Content />
+            </div>
+          </section>
+        )
+      }
+
+      {
+        practice.sources.length > 0 && (
+          <section aria-labelledby="sources-heading" class="mt-10">
+            <h2 id="sources-heading" class="font-display text-2xl font-bold text-earth">Sources &amp; further reading</h2>
+            <ul role="list" class="mt-4 space-y-2 text-sm leading-relaxed text-clay">
+              {practice.sources.map((source) => (
+                <li class="flex gap-2">
+                  <span aria-hidden="true" class="mt-0.5 text-indigo-deep">◆</span>
+                  <span>
+                    {source.url ? (
+                      <ExternalLink href={source.url} class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2">
+                        {source.title}
+                      </ExternalLink>
+                    ) : (
+                      <span class="font-medium text-earth">{source.title}</span>
+                    )}
+                    {source.author && <span>, {source.author}</span>}
+                    {source.reference && <span class="italic"> ({source.reference})</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )
+      }
+
+      <div class="mt-10">
+        <Disclaimer variant="general" />
+      </div>
+    </article>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      {practice.durationGuidance && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Rhythm</h2>
+          <p class="mt-3 text-sm leading-relaxed text-clay">{practice.durationGuidance}</p>
+          <p class="mt-3 text-xs leading-relaxed text-clay">Regularity over length, the tradition is unanimous.</p>
+        </div>
+      )}
+
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Keep exploring</h2>
+        <a href="/mind/meditation/" class="mt-3 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep">
+          All practices &amp; concepts →
+        </a>
+      </div>
+    </aside>
+  </div>
+</PageLayout>

@@ -1,0 +1,86 @@
+---
+/**
+ * Category page, one of the five fixed wiki categories, alphabetical.
+ * Routed via src/pages/wiki/[category]/index.astro (thin wrapper).
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import ArticleCard from '../components/ArticleCard.astro';
+import { wikiEnabled } from '../lib/articles';
+import { WIKI_CATEGORIES, categoryHref, categoryIntro, categoryLabel } from '../lib/domain';
+import type { WikiCategory } from '../lib/domain';
+import type { WikiArticle } from '../schemas/article';
+
+export async function getStaticPaths() {
+  if (!wikiEnabled()) return [];
+  const entries = await getCollection('wiki-articles');
+  const used = WIKI_CATEGORIES.filter((category) =>
+    entries.some((entry) => entry.data.category === category),
+  );
+  return used.map((category) => ({
+    params: { category },
+    props: {
+      articles: entries
+        .filter((entry) => entry.data.category === category)
+        .map((entry) => entry.data)
+        .sort((a, b) => a.title.localeCompare(b.title, 'en')),
+    },
+  }));
+}
+
+interface Props {
+  articles: WikiArticle[];
+}
+
+const { articles } = Astro.props;
+const category = Astro.params.category as WikiCategory;
+const path = categoryHref(category);
+const others = WIKI_CATEGORIES.filter((c) => c !== category);
+---
+
+<PageLayout
+  title={`${categoryLabel[category]}, Wiki`}
+  description={`${categoryIntro[category]} ${articles.length} articles, alphabetical.`}
+  heading={categoryLabel[category]}
+  eyebrow="Sitewide · Wiki"
+  lede={categoryIntro[category]}
+  path={path}
+  accent="sage"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Wiki', path: '/wiki/' },
+      { name: categoryLabel[category], path },
+    ]),
+  ]}
+>
+  <ul role="list" class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    {articles.map((article) => <ArticleCard article={article} />)}
+  </ul>
+
+  <nav aria-label="Other wiki categories" class="mt-12 border-t border-sand pt-6">
+    <h2 class="text-xs font-semibold tracking-wide text-clay uppercase">Other categories</h2>
+    <ul role="list" class="mt-3 flex flex-wrap gap-2 text-sm">
+      {
+        others.map((other) => (
+          <li>
+            <a
+              href={categoryHref(other)}
+              class="inline-flex items-center rounded-full bg-sage/15 px-3 py-1 font-medium text-sage-deep hover:bg-sage/25"
+            >
+              {categoryLabel[other]}
+            </a>
+          </li>
+        ))
+      }
+      <li>
+        <a href="/wiki/" class="inline-flex items-center rounded-full border border-sand px-3 py-1 font-medium text-earth hover:border-sage/60">
+          Full index →
+        </a>
+      </li>
+    </ul>
+  </nav>
+</PageLayout>

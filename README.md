@@ -1,3 +1,0 @@
-# Satvik Foods
-
-## Coming Soon 🚀

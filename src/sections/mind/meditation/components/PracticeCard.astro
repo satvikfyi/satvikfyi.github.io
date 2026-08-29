@@ -1,0 +1,33 @@
+---
+/**
+ * PracticeCard, a listing entry for the meditation module. No filter
+ * island exists (the listing groups practices and concepts statically), so
+ * no data attributes are needed.
+ */
+import Tag from '../../../../shared/components/Tag.astro';
+import type { Practice } from '../schemas/practice';
+import { kindLabel } from '../lib/domain';
+
+interface Props {
+  practice: Practice;
+}
+
+const { practice } = Astro.props;
+const detailHref = `/mind/meditation/${practice.slug}/`;
+---
+
+<li
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-indigo/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <div class="mb-2 flex flex-wrap items-center gap-2">
+    <Tag label={kindLabel[practice.kind]} accent="indigo" />
+  </div>
+  <h3 class="font-display text-xl leading-snug font-semibold text-earth">
+    <a href={detailHref} class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2">
+      {practice.name}
+    </a>
+  </h3>
+  {practice.sanskritName && <p class="mt-0.5 text-sm font-medium text-clay italic">{practice.sanskritName}</p>}
+  <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-clay">{practice.summary}</p>
+  <p class="mt-auto pt-4 text-xs font-medium tracking-wide text-clay uppercase">{practice.tradition}</p>
+</li>

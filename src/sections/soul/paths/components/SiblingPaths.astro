@@ -1,0 +1,44 @@
+---
+/**
+ * SiblingPaths, the other enabled soul-path modules, from the registry.
+ * Rendered by each path's overview page; drops the current module and any
+ * disabled sibling automatically.
+ */
+import { enabledModules } from '../../../../config/sections';
+import { pathModuleId } from '../lib/domain';
+import type { SoulPath } from '../lib/domain';
+
+interface Props {
+  /** The path this page belongs to (excluded from the list). */
+  current: SoulPath;
+}
+
+const { current } = Astro.props;
+const currentId = pathModuleId[current];
+const siblings = enabledModules('soul').filter((m) => m.id !== currentId);
+---
+
+{
+  siblings.length > 0 && (
+    <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+      <h2 class="font-display text-base font-semibold text-earth">The other paths</h2>
+      <p class="mt-2 text-sm leading-relaxed text-clay">
+        The classical traditions speak of several paths up one mountain, each suited to a different
+        walker, all arriving where the others do.
+      </p>
+      <ul role="list" class="mt-4 space-y-2 text-sm">
+        {siblings.map((module) => (
+          <li>
+            <a
+              href={module.routePrefix}
+              class="font-medium text-plum-deep underline decoration-plum/60 underline-offset-2 hover:decoration-plum-deep"
+            >
+              {module.title}
+            </a>
+            <span class="text-clay">, {module.description}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

@@ -1,0 +1,235 @@
+---
+/**
+ * Quiz page, the dosha questionnaire. The server renders every question as
+ * plain fieldsets (the no-JS fallback: a printed scoring key lets you tally
+ * by hand); the island turns the same markup into a step-by-step wizard with
+ * client-side scoring, saves { dosha, date } via the shared localStorageStore
+ * (`satvikfyi:v1:quiz-result`) and links out to each module with ?dosha=.
+ * Routed via src/pages/quiz/index.astro (thin wrapper).
+ */
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import config from '../module.config';
+import { DOSHAS, QUESTIONS, doshaLabel } from '../lib/questions';
+
+const letters = ['a', 'b', 'c'] as const;
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="What's your dosha?"
+  eyebrow="Sitewide · Quiz"
+  lede="Twelve quiet questions about body, energy and mind. Your answers are scored on this page, the result is saved on this device only, and the meal planner, recipes, asanas and herbs quietly take it from there."
+  path={config.routePrefix}
+  accent="sage"
+  jsonLd={[
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div id="quiz" class="mt-8 max-w-3xl">
+    <form id="quiz-form" novalidate>
+      {
+        QUESTIONS.map((question, index) => (
+          <fieldset name={question.id} class="rounded-2xl border border-sand bg-parchment/60 p-6">
+            <legend class="font-display text-lg font-semibold text-earth">
+              {index + 1}. {question.prompt}
+            </legend>
+            {question.help && <p class="mt-1 text-xs leading-relaxed text-clay">{question.help}</p>}
+            <ul role="list" class="mt-4 space-y-2">
+              {question.options.map((option, optionIndex) => (
+                <li>
+                  <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-sand bg-cream p-4 text-sm leading-relaxed text-earth transition-colors has-checked:border-sage/60 has-checked:bg-sage/10">
+                    <input
+                      type="radio"
+                      name={question.id}
+                      value={option.dosha}
+                      class="mt-0.5 h-4 w-4 shrink-0 accent-sage-deep"
+                    />
+                    <span>
+                      <span aria-hidden="true" class="font-semibold text-clay">{letters[optionIndex]})</span>
+                      {' '}
+                      {option.label}
+                    </span>
+                  </label>
+                </li>
+              ))}
+            </ul>
+          </fieldset>
+        ))
+      }
+    </form>
+
+    <div id="quiz-nav" hidden class="mt-6 space-y-4">
+      <div>
+        <p id="quiz-progress" role="status" aria-live="polite" class="text-sm font-medium text-sage-deep"></p>
+        <div class="mt-2 h-2 overflow-hidden rounded-full bg-sand/60" role="presentation">
+          <span id="quiz-progress-bar" class="block h-full rounded-full bg-sage transition-[width] motion-reduce:transition-none" style="width: 0%"></span>
+        </div>
+      </div>
+      <div class="flex items-center justify-between gap-4">
+        <button
+          type="button"
+          id="quiz-back"
+          class="rounded-xl border border-sand bg-cream px-5 py-2.5 text-sm font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          ← Back
+        </button>
+        <button
+          type="button"
+          id="quiz-next"
+          class="rounded-xl bg-sage-deep px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-earth disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Next question
+        </button>
+      </div>
+    </div>
+
+    <noscript>
+      <div class="mt-8 rounded-2xl border border-sand bg-parchment/60 p-6 text-sm leading-relaxed text-clay">
+        <p class="mb-2 font-semibold text-earth">Scoring without JavaScript</p>
+        <p class="mb-3">
+          JavaScript is off, so score yourself: note the letter (a, b or c) that fits you best for each
+          question, then count your letters with the key below. The letter you chose most points to
+          your dominant dosha, most people are a blend.
+        </p>
+        <ul role="list" class="grid grid-cols-1 gap-x-8 gap-y-1 sm:grid-cols-2">
+          {
+            QUESTIONS.map((question, index) => (
+              <li>
+                <span class="font-medium text-earth">{index + 1}.</span>{' '}
+                {question.options.map((option, optionIndex) => (
+                  <>
+                    <span aria-hidden="true">{letters[optionIndex]}={doshaLabel[option.dosha]}</span>{' '}
+                    <span class="sr-only">
+                      option {letters[optionIndex]} is {doshaLabel[option.dosha]},
+                    </span>
+                  </>
+                ))}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </noscript>
+
+    <div id="quiz-result" hidden class="mt-8 rounded-2xl border border-sage/40 bg-parchment/60 p-8" aria-labelledby="quiz-result-title">
+      <p class="text-xs font-semibold tracking-wide text-sage-deep uppercase">Your dominant dosha</p>
+      <h2 id="quiz-result-title" tabindex="-1" class="mt-2 font-display text-3xl font-bold text-earth focus:outline-none"></h2>
+      <p id="quiz-result-elements" class="mt-1 text-sm font-medium text-clay"></p>
+      <p id="quiz-result-blurb" class="mt-4 text-sm leading-relaxed text-earth"></p>
+
+      <ul id="quiz-bars" role="list" class="mt-6 space-y-3" aria-label="Score by dosha">
+        {
+          DOSHAS.map((dosha) => (
+            <li>
+              <div class="flex items-baseline justify-between gap-4 text-sm">
+                <span class="font-medium text-earth capitalize">{doshaLabel[dosha]}</span>
+                <span id={`quiz-count-${dosha}`} class="text-xs text-clay"></span>
+              </div>
+              <div class="mt-1 h-2 overflow-hidden rounded-full bg-sand/60" role="presentation">
+                <span
+                  id={`quiz-bar-${dosha}`}
+                  class="block h-full rounded-full bg-sage transition-[width] motion-reduce:transition-none"
+                  style="width: 0%"
+                />
+              </div>
+            </li>
+          ))
+        }
+      </ul>
+
+      <p id="quiz-saved-note" hidden class="mt-4 text-xs leading-relaxed text-clay"></p>
+
+      <div class="mt-6 border-t border-sand pt-5">
+        <h3 class="font-display text-base font-semibold text-earth">Follow your result</h3>
+        <p class="mt-1 text-sm leading-relaxed text-clay">
+          Each link below filters that collection to balance your result, and the planner adopts it
+          as its default dosha.
+        </p>
+        <ul role="list" class="mt-3 flex flex-wrap gap-3 text-sm">
+          {isModuleEnabled('meals') && (
+            <li>
+              <a
+                data-quiz-link
+                href="/body/meals/planner/"
+                class="inline-block rounded-xl bg-sage-deep px-4 py-2 font-semibold text-cream transition-colors hover:bg-earth"
+              >
+                Open your meal planner
+              </a>
+            </li>
+          )}
+          {isModuleEnabled('meals') && (
+            <li>
+              <a
+                data-quiz-link
+                href="/body/meals/"
+                class="inline-block rounded-xl border border-sand bg-cream px-4 py-2 font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep"
+              >
+                Recipes for your dosha
+              </a>
+            </li>
+          )}
+          {isModuleEnabled('yoga') && (
+            <li>
+              <a
+                data-quiz-link
+                href="/body/yoga/"
+                class="inline-block rounded-xl border border-sand bg-cream px-4 py-2 font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep"
+              >
+                Asanas for your dosha
+              </a>
+            </li>
+          )}
+          {isModuleEnabled('ayurveda') && (
+            <li>
+              <a
+                data-quiz-link
+                href="/body/ayurveda/"
+                class="inline-block rounded-xl border border-sand bg-cream px-4 py-2 font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep"
+              >
+                Herbs for your dosha
+              </a>
+            </li>
+          )}
+        </ul>
+        <div class="mt-5 flex flex-wrap gap-3">
+          <button
+            type="button"
+            id="quiz-retake"
+            class="rounded-xl border border-sand bg-cream px-5 py-2.5 text-sm font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep"
+          >
+            Retake the quiz
+          </button>
+          <button
+            type="button"
+            id="quiz-forget"
+            class="rounded-xl border border-sand bg-cream px-5 py-2.5 text-sm font-semibold text-clay transition-colors hover:border-plum/60 hover:text-plum-deep"
+          >
+            Forget my result
+          </button>
+        </div>
+      </div>
+
+      <p class="mt-5 text-xs leading-relaxed text-clay">
+        The result is stored only in this browser's local storage (key <code>satvikfyi:v1:quiz-result</code>),
+never on a server, and never sent anywhere. "Forget my result" removes it.
+      </p>
+    </div>
+
+    <div class="mt-10">
+      <Disclaimer variant="ayurveda" />
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  import { mountQuiz } from '../components/Quiz';
+  mountQuiz(document.getElementById('quiz'));
+</script>

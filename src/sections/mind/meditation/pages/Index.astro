@@ -1,0 +1,118 @@
+---
+/**
+ * Meditation module listing, grouped statically into Practices and
+ * Concepts. Zero client JavaScript: the grouping IS the interface.
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import PracticeCard from '../components/PracticeCard.astro';
+import config from '../module.config';
+
+const entries = await getCollection('meditation-practices');
+const practices = entries
+  .map((entry) => entry.data)
+  .filter((p) => p.kind === 'practice')
+  .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+const concepts = entries
+  .map((entry) => entry.data)
+  .filter((p) => p.kind === 'concept')
+  .sort((a, b) => a.name.localeCompare(b.name, 'en'));
+const total = entries.length;
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Meditation"
+  eyebrow="Mind · Dhyāna"
+  lede={`${total} practices and the concepts beneath them, from the Buddha's mindfulness of breath to Patañjali's definition of dhyāna itself; each taught simply and cited to its source. Begin with the breath; everything else waits.`}
+  path={config.routePrefix}
+  accent="indigo"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Mind', path: '/mind/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="lg:col-span-2 space-y-12">
+      <section aria-labelledby="practices-heading">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="practices-heading" class="font-display text-2xl font-bold text-earth">Practices</h2>
+          <p class="text-xs text-clay">{practices.length} how-to practices, from breath to witness</p>
+        </div>
+        <ul role="list" class="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
+          {practices.map((practice) => <PracticeCard practice={practice} />)}
+        </ul>
+      </section>
+
+      <section aria-labelledby="concepts-heading">
+        <div class="flex flex-wrap items-baseline justify-between gap-2">
+          <h2 id="concepts-heading" class="font-display text-2xl font-bold text-earth">Concepts &amp; philosophy</h2>
+          <p class="text-xs text-clay">{concepts.length} entries that name what the practices do</p>
+        </div>
+        <ul role="list" class="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
+          {concepts.map((concept) => <PracticeCard practice={concept} />)}
+        </ul>
+      </section>
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">A simple beginning</h2>
+        <ol role="list" class="mt-3 space-y-2 text-sm leading-relaxed text-clay">
+          <li>1 · Sit upright and comfortable, a chair honestly counts.</li>
+          <li>2 · Ten minutes, attention on the breath, returning each time it wanders.</li>
+          <li>3 · Same time daily; regularity beats duration.</li>
+        </ol>
+        <a
+          href="/mind/meditation/anapana/"
+          class="mt-4 inline-block rounded-xl bg-indigo-deep px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+        >
+          Start with ānāpāna
+        </a>
+      </div>
+
+      {isModuleEnabled('pranayama') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Prepare with the breath</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            A few quiet rounds of prāṇāyāma gather the mind before sitting, nāḍī śodhana is the
+            classical choice.
+          </p>
+          <a
+            href="/mind/pranayama/nadi-shodhana/"
+            class="mt-4 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep"
+          >
+            Nāḍī Śodhana →
+          </a>
+        </div>
+      )}
+
+      {isModuleEnabled('mantras') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Give the mind a sound</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            Japa, mantra repetition; pairs naturally with silence. The mantra database carries the
+            texts with transliteration and meaning.
+          </p>
+          <a
+            href="/mind/mantras/"
+            class="mt-4 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep"
+          >
+            Browse the mantras →
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</PageLayout>

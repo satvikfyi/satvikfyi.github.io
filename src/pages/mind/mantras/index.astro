@@ -1,0 +1,11 @@
+---
+// Route entry for /mind/mantras/, delegates to the mantras module.
+import Index from '../../../sections/mind/mantras/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('mantras')) {
+  return Astro.redirect('/mind/', 302);
+}
+---
+
+<Index />

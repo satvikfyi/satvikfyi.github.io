@@ -1,0 +1,161 @@
+---
+/**
+ * Meals module listing, every recipe rendered in HTML (the no-JS
+ * fallback IS this page), with a self-contained filter island layered on
+ * top. Zero JS unless the island loads.
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import RecipeCard from '../components/RecipeCard.astro';
+import config from '../module.config';
+import { FILTER_SEASONS, MEAL_TYPES, SATVIK_TAGS, doshaLabel, mealTypeLabel, satvikTagLabel, seasonLabel } from '../lib/domain';
+import type { SatvikTag } from '../lib/domain';
+
+const entries = await getCollection('meals-recipes');
+const recipes = entries
+  .map((entry) => entry.data)
+  .sort(
+    (a, b) =>
+      MEAL_TYPES.indexOf(a.mealType) - MEAL_TYPES.indexOf(b.mealType) || a.title.localeCompare(b.title, 'en'),
+  );
+
+const usedTags = SATVIK_TAGS.filter((tag) => recipes.some((r) => r.satvikTags.includes(tag)));
+const countByMeal = MEAL_TYPES.map((meal) => ({
+  meal,
+  count: recipes.filter((r) => r.mealType === meal).length,
+}));
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Satvik Recipes"
+  eyebrow="Body · Meals"
+  lede={`${recipes.length} freshly-cooked, source-cited satvik recipes; breakfast to dinner, each noting its effect on vāta, pitta and kapha, the seasons it suits, and a clear ingredient list.`}
+  path={config.routePrefix}
+  accent="sage"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Body', path: '/body/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="lg:col-span-2">
+      <div id="recipe-filters" hidden class="mb-6 rounded-2xl border border-sand bg-parchment/60 p-5">
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div>
+            <label for="filter-dosha" class="mb-1 block text-xs font-semibold tracking-wide text-earth uppercase">Dosha</label>
+            <select id="filter-dosha" class="w-full rounded-lg border border-sand bg-cream px-3 py-2 text-sm text-earth">
+              <option value="">Any dosha</option>
+              {(['vata', 'pitta', 'kapha'] as const).map((dosha) => (
+                <option value={dosha}>Balances {doshaLabel[dosha]}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label for="filter-meal" class="mb-1 block text-xs font-semibold tracking-wide text-earth uppercase">Meal</label>
+            <select id="filter-meal" class="w-full rounded-lg border border-sand bg-cream px-3 py-2 text-sm text-earth">
+              <option value="">Any meal</option>
+              {MEAL_TYPES.map((meal) => (
+                <option value={meal}>{mealTypeLabel[meal]}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label for="filter-season" class="mb-1 block text-xs font-semibold tracking-wide text-earth uppercase">Season</label>
+            <select id="filter-season" class="w-full rounded-lg border border-sand bg-cream px-3 py-2 text-sm text-earth">
+              <option value="">Any season</option>
+              {FILTER_SEASONS.map((season) => (
+                <option value={season}>{seasonLabel[season]}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label for="filter-tag" class="mb-1 block text-xs font-semibold tracking-wide text-earth uppercase">Satvik tag</label>
+            <select id="filter-tag" class="w-full rounded-lg border border-sand bg-cream px-3 py-2 text-sm text-earth">
+              <option value="">Any tag</option>
+              {usedTags.map((tag: SatvikTag) => (
+                <option value={tag}>{satvikTagLabel[tag]}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+        <div class="mt-4 flex items-center justify-between gap-4">
+          <p id="recipe-count" role="status" aria-live="polite" class="text-sm text-clay">
+            Showing all {recipes.length} recipes
+          </p>
+          <button
+            type="button"
+            id="filter-clear"
+            class="rounded-lg border border-sand bg-cream px-3 py-1.5 text-xs font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Clear filters
+          </button>
+        </div>
+        <p id="quiz-applied-note" hidden class="mt-2 text-xs leading-relaxed text-clay">
+          Filtered to your saved dosha-quiz result, adjust the dosha above, or retake the quiz to change it.
+        </p>
+      </div>
+
+      <noscript>
+        <p class="mb-6 rounded-2xl border border-sand bg-parchment/60 p-4 text-sm leading-relaxed text-clay">
+          JavaScript is off, so all {recipes.length} recipes are listed below, browse the full collection.
+        </p>
+      </noscript>
+
+      <p class="mb-4 text-xs leading-relaxed text-clay">
+        Reading the chips: <strong class="font-semibold text-earth">vāta +</strong> means the recipe balances
+        vāta · <strong class="font-semibold text-earth">·</strong> means neutral ·
+        <strong class="font-semibold text-earth">−</strong> means it can aggravate that dosha.
+      </p>
+
+      <ul id="recipe-grid" role="list" class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        {recipes.map((recipe) => <RecipeCard recipe={recipe} />)}
+      </ul>
+
+      <div class="mt-10">
+        <Disclaimer variant="ayurveda" />
+      </div>
+    </div>
+
+    <aside class="h-fit rounded-2xl border border-sand bg-parchment/60 p-6 lg:sticky lg:top-6">
+      <h2 class="font-display text-base font-semibold text-earth">Plan your week</h2>
+      <p class="mt-2 text-sm leading-relaxed text-clay">
+        Turn these recipes into a seven-day breakfast-lunch-dinner plan that favours dishes balancing your
+        dosha, with a shopping list that adds itself up.
+      </p>
+      <a
+        href="/body/meals/planner/"
+        class="mt-4 inline-block rounded-xl bg-sage-deep px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+      >
+        Open the meal planner
+      </a>
+      <dl class="mt-6 space-y-2 border-t border-sand pt-4 text-sm">
+        {
+          countByMeal.map(({ meal, count }) => (
+            <div class="flex items-baseline justify-between gap-4">
+              <dt class="text-clay">{mealTypeLabel[meal]}</dt>
+              <dd class="font-semibold text-earth">{count}</dd>
+            </div>
+          ))
+        }
+        <div class="flex items-baseline justify-between gap-4 border-t border-sand pt-2">
+          <dt class="text-clay">Total</dt>
+          <dd class="font-semibold text-earth">{recipes.length}</dd>
+        </div>
+      </dl>
+    </aside>
+  </div>
+</PageLayout>
+
+<script>
+  import { mountFilters } from '../components/RecipeFilters';
+  mountFilters(document.getElementById('recipe-filters'));
+</script>

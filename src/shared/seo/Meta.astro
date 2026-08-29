@@ -1,0 +1,52 @@
+---
+/**
+ * SEO meta, the single place head tags are rendered. Used by BaseLayout.
+ */
+import { SITE } from '../../config/site';
+
+interface Props {
+  /** Page title; the site name is appended automatically. */
+  title?: string;
+  description?: string;
+  /** Absolute path of the page, e.g. "/body/meals/". */
+  path: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  /** Absolute social-share image URL; enables summary_large_image cards. */
+  image?: string;
+}
+
+const { title, description = SITE.description, path, type = 'website', noindex = false, image } = Astro.props;
+
+const normalizedPath = path === '' ? '/' : path.startsWith('/') ? path : `/${path}`;
+const canonicalPath = normalizedPath.endsWith('/') || /\.[a-z0-9]+$/i.test(normalizedPath)
+  ? normalizedPath
+  : `${normalizedPath}/`;
+const canonical = `${SITE.url}${canonicalPath}`;
+const pageTitle = title ? `${title} · ${SITE.name}` : SITE.title;
+// OpenGraph default: every page gets the branded image unless it brings its own.
+const ogImage = image ?? `${SITE.url}/assets/og-default.png`;
+---
+
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
+
+<meta property="og:site_name" content={SITE.name} />
+<meta property="og:type" content={type} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content="en" />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<meta name="generator" content={Astro.generator} />

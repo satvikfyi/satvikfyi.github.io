@@ -1,0 +1,51 @@
+# Quality gate for every push / PR to main.
+#
+# NOTE: GitHub only reads workflows from the repository root's .github/
+# directory. This file lives at website/20260822/.github/ per the spec's
+# canonical layout (the folder is designed to be its own site repository).
+# If the site stays nested inside satvikfyi_assets, move this file to the
+# repo root and add `defaults: { run: { working-directory: website/20260822 } }`.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Build, types, links, Lighthouse
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type & schema check (astro check)
+        run: npm run check
+
+      - name: Build
+        run: npm run build
+
+      - name: Internal link check
+        run: npm run check:links
+
+      - name: Search index check (size budget + validity)
+        run: npm run check:search
+
+      - name: SEO check (canonical, og:image, JSON-LD, robots, sitemap)
+        run: npm run check:seo
+
+      - name: Lighthouse CI (perf >= 0.9, a11y >= 0.95)
+        run: npx --yes @lhci/cli@0.15 autorun

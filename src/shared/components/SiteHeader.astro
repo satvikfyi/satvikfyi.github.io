@@ -1,0 +1,84 @@
+---
+/**
+ * SiteHeader, the primary navigation. Per the site's nav rule it shows
+ * ONLY the three pillars (plus the site title); everything else lives in
+ * the footer. Rendered purely from the section registry; zero client JS.
+ * The search box (Phase 5) is progressive enhancement in its purest form:
+ * a plain GET form that navigates to /search/?q=…, no script involved,
+ * rendered only while the search module is enabled.
+ */
+import { pillars, isModuleEnabled } from '../../config/sections';
+import { accentText } from './accents';
+
+interface Props {
+  currentPath: string;
+}
+
+const { currentPath } = Astro.props;
+
+const isActive = (routePrefix: string) =>
+  routePrefix === '/' ? currentPath === '/' : currentPath.startsWith(routePrefix);
+---
+
+<header class="border-b border-sand bg-cream">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-4 py-4 sm:px-6">
+    <a href="/" class="font-display text-xl font-bold tracking-tight text-earth">
+      Satvik<span class="text-saffron-deep">.fyi</span>
+    </a>
+    <div class="flex flex-wrap items-center gap-3 sm:gap-6">
+      <nav aria-label="Primary">
+        <ul class="flex items-center gap-1 sm:gap-2">
+          {
+            pillars.map((pillar) => (
+              <li>
+                <a
+                  href={pillar.routePrefix}
+                  aria-current={isActive(pillar.routePrefix) ? 'page' : undefined}
+                  class:list={[
+                    'rounded-lg px-3 py-2 text-sm font-semibold transition-colors',
+                    'hover:bg-parchment',
+                    isActive(pillar.routePrefix)
+                      ? ['bg-parchment', accentText[pillar.accent ?? 'saffron'], 'underline', 'decoration-2', 'underline-offset-4']
+                      : 'text-earth',
+                  ]}
+                >
+                  {pillar.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      {
+        isModuleEnabled('search') && (
+          <form action="/search/" method="get" role="search" class="flex items-center">
+            <label for="header-search" class="sr-only">
+              Search Satvik.fyi
+            </label>
+            <div class="flex items-center gap-1.5 rounded-full border border-sand bg-parchment/60 py-1.5 pl-3 pr-1.5 transition-colors focus-within:border-sage/60">
+              <svg aria-hidden="true" viewBox="0 0 24 24" class="h-4 w-4 shrink-0 text-clay" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="16.5" y1="16.5" x2="21" y2="21"></line>
+              </svg>
+              <input
+                id="header-search"
+                type="search"
+                name="q"
+                placeholder="Search…"
+                autocomplete="off"
+                class="w-28 bg-transparent text-sm text-earth placeholder:text-clay/70 focus:outline-none sm:w-36"
+              />
+              <button
+                type="submit"
+                class="rounded-full bg-sage-deep px-3 py-1 text-xs font-semibold text-cream transition-colors hover:bg-earth"
+              >
+                Go
+              </button>
+            </div>
+          </form>
+        )
+      }
+    </div>
+  </div>
+</header>

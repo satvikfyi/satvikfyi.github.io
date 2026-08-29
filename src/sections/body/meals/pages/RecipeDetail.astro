@@ -1,0 +1,228 @@
+---
+/**
+ * Recipe detail, ingredients, steps, dosha effects, seasonal notes,
+ * sources, ayurvedic disclaimer, JSON-LD Recipe and print styles.
+ * Routed via src/pages/body/meals/recipes/[slug].astro (thin wrapper).
+ */
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import Tag from '../../../../shared/components/Tag.astro';
+import ExternalLink from '../../../../shared/components/ExternalLink.astro';
+import { breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import DoshaChips from '../components/DoshaChips.astro';
+import { recipeJsonLd } from '../lib/jsonld';
+import config from '../module.config';
+import { mealTypeLabel, satvikTagLabel, seasonLabel } from '../lib/domain';
+import '../styles/print.css';
+
+export async function getStaticPaths() {
+  // Disabled module → no detail pages are built at all.
+  if (!isModuleEnabled('meals')) return [];
+  const entries = await getCollection('meals-recipes');
+  return entries.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'meals-recipes'>;
+}
+
+const { entry } = Astro.props;
+const recipe = entry.data;
+const { Content } = await render(entry);
+const hasBody = typeof entry.body === 'string' && entry.body.trim().length > 0;
+const path = `/body/meals/recipes/${recipe.slug}/`;
+
+const timeText = [
+  recipe.prepTime > 0 ? `${recipe.prepTime} min prep` : null,
+  recipe.cookTime > 0 ? `${recipe.cookTime} min cook` : null,
+].filter(Boolean).join(' · ');
+---
+
+<PageLayout
+  title={recipe.title}
+  description={recipe.summary}
+  heading={recipe.title}
+  eyebrow={`Body · ${mealTypeLabel[recipe.mealType]}`}
+  path={path}
+  type="article"
+  accent="sage"
+  jsonLd={[
+    recipeJsonLd({ recipe, siteUrl: SITE.url, path, siteName: SITE.name }),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Body', path: '/body/' },
+      { name: config.title, path: config.routePrefix },
+      { name: recipe.title, path },
+    ]),
+  ]}
+>
+  <nav aria-label="Breadcrumb" class="mb-6">
+    <ol class="flex flex-wrap items-center gap-2 text-sm text-clay">
+      <li><a href="/" class="hover:text-saffron-deep hover:underline">Home</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/body/" class="hover:text-saffron-deep hover:underline">Body</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/body/meals/" class="hover:text-saffron-deep hover:underline">Satvik Meals</a></li>
+      <li aria-hidden="true">/</li>
+      <li aria-current="page" class="font-medium text-earth">{recipe.title}</li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+    <article class="lg:col-span-2">
+      <p class="text-lg leading-relaxed text-clay">{recipe.summary}</p>
+      <p class="mt-3 flex flex-wrap items-center gap-2 text-sm font-medium text-clay">
+        <span>{mealTypeLabel[recipe.mealType]} · {timeText} · serves {recipe.servings}</span>
+        {recipe.reviewStatus === 'draft' && <Tag label="Newly added" accent="saffron" />}
+      </p>
+
+      <section aria-labelledby="ingredients-heading" class="mt-10">
+        <h2 id="ingredients-heading" class="font-display text-2xl font-bold text-earth">Ingredients</h2>
+        <ul role="list" class="mt-4 grid grid-cols-1 gap-x-8 gap-y-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2 print:grid-cols-1">
+          {
+            recipe.ingredients.map((ingredient) => (
+              <li class="text-sm leading-relaxed text-earth">
+                <span class="font-semibold">{ingredient.quantity ? `${ingredient.quantity} ` : ''}{ingredient.item}</span>
+                {ingredient.note && <span class="text-clay">, {ingredient.note}</span>}
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="steps-heading" class="mt-10">
+        <h2 id="steps-heading" class="font-display text-2xl font-bold text-earth">Preparation</h2>
+        <ol role="list" class="mt-4 space-y-4">
+          {
+            recipe.steps.map((step, index) => (
+              <li class="flex gap-4">
+                <span
+                  aria-hidden="true"
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sage/15 text-sm font-bold text-sage-deep"
+                >
+                  {index + 1}
+                </span>
+                <p class="text-sm leading-relaxed text-earth">{step}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      {
+        hasBody && (
+          <section aria-labelledby="tradition-heading" class="mt-10">
+            <h2 id="tradition-heading" class="font-display text-2xl font-bold text-earth">In the tradition</h2>
+            <div class="prose prose-earth mt-4 max-w-none prose-headings:font-display prose-a:text-saffron-deep">
+              <Content />
+            </div>
+          </section>
+        )
+      }
+
+      {
+        recipe.sources.length > 0 && (
+          <section aria-labelledby="sources-heading" class="mt-10">
+            <h2 id="sources-heading" class="font-display text-2xl font-bold text-earth">Sources &amp; further reading</h2>
+            <ul role="list" class="mt-4 space-y-2 text-sm leading-relaxed text-clay">
+              {recipe.sources.map((source) => (
+                <li class="flex gap-2">
+                  <span aria-hidden="true" class="mt-0.5 text-sage-deep">◆</span>
+                  <span>
+                    {source.url ? (
+                      <ExternalLink href={source.url} class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2">
+                        {source.title}
+                      </ExternalLink>
+                    ) : (
+                      <span class="font-medium text-earth">{source.title}</span>
+                    )}
+                    {source.author && <span>, {source.author}</span>}
+                    {source.reference && <span class="italic"> ({source.reference})</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p class="mt-3 text-xs leading-relaxed text-clay">
+              Classical citations mark where a tradition is drawn on; modern books are shared as further
+              reading, not as prescriptions.
+            </p>
+          </section>
+        )
+      }
+
+      <div class="mt-10">
+        <Disclaimer variant="ayurveda" />
+      </div>
+    </article>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Dosha effects</h2>
+        <div class="mt-3">
+          <DoshaChips effects={recipe.doshaEffects} />
+        </div>
+        <p class="mt-3 text-xs leading-relaxed text-clay">
+          Effects follow traditional ayurvedic food energetics and are educational, not medical guidance.
+        </p>
+      </div>
+
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Seasons</h2>
+        <ul role="list" class="mt-3 flex flex-wrap gap-2">
+          {recipe.seasonalSuitability.map((season) => (
+            <li><Tag label={seasonLabel[season]} accent="saffron" /></li>
+          ))}
+        </ul>
+        {
+          recipe.satvikTags.length > 0 && (
+            <>
+              <h3 class="mt-5 font-display text-base font-semibold text-earth">Satvik qualities</h3>
+              <ul role="list" class="mt-3 flex flex-wrap gap-2">
+                {recipe.satvikTags.map((tag) => (
+                  <li><Tag label={satvikTagLabel[tag]} /></li>
+                ))}
+              </ul>
+            </>
+          )
+        }
+        {recipe.dietNotes && <p class="mt-5 text-xs leading-relaxed text-clay">{recipe.dietNotes}</p>}
+      </div>
+
+      <div class="no-print rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Make it part of a week</h2>
+        <p class="mt-2 text-sm leading-relaxed text-clay">
+          Add this recipe's spirit to your rotation, the planner builds a seven-day menu around your dosha.
+        </p>
+        <a
+          href="/body/meals/planner/"
+          class="mt-4 inline-block rounded-xl bg-sage-deep px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+        >
+          Open the planner
+        </a>
+        <button
+          type="button"
+          id="print-recipe"
+          hidden
+          class="mt-3 w-full rounded-xl border border-sand bg-cream px-5 py-2.5 text-sm font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep"
+        >
+          Print this recipe
+        </button>
+      </div>
+    </aside>
+  </div>
+</PageLayout>
+
+<script>
+  const button = document.getElementById('print-recipe');
+  if (button) {
+    button.addEventListener('click', () => window.print());
+    button.hidden = false;
+  }
+</script>

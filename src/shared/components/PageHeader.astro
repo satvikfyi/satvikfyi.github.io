@@ -1,0 +1,30 @@
+---
+/**
+ * PageHeader, eyebrow, H1 and lede for a page or section.
+ */
+import { accentText } from './accents';
+import type { AccentToken } from '../../config/module';
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  description?: string;
+  accent?: AccentToken;
+  /** Center the header (default: left-aligned). */
+  centered?: boolean;
+}
+
+const { title, eyebrow, description, accent = 'saffron', centered = false } = Astro.props;
+---
+
+<header class:list={['max-w-3xl', centered && 'mx-auto text-center']}>
+  {
+    eyebrow && (
+      <p class:list={['mb-2 text-sm font-semibold tracking-wide uppercase', accentText[accent]]}>
+        {eyebrow}
+      </p>
+    )
+  }
+  <h1 class="font-display text-3xl leading-tight font-bold text-earth sm:text-4xl">{title}</h1>
+  {description && <p class="mt-4 text-lg leading-relaxed text-clay">{description}</p>}
+</header>

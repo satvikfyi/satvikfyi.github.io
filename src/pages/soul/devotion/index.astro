@@ -1,0 +1,11 @@
+---
+// Route entry for /soul/devotion/, delegates to the bhakti yoga module.
+import Index from '../../../sections/soul/devotion/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('devotion')) {
+  return Astro.redirect('/soul/', 302);
+}
+---
+
+<Index />

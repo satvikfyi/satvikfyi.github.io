@@ -1,0 +1,13 @@
+---
+// Route entry for /body/ayurveda/, delegates to the ayurveda module.
+// Registry guard: a disabled module redirects to its parent pillar instead
+// of rendering, so flipping `enabled: false` removes it cleanly.
+import Index from '../../../sections/body/ayurveda/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('ayurveda')) {
+  return Astro.redirect('/body/', 302);
+}
+---
+
+<Index />

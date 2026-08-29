@@ -1,0 +1,11 @@
+---
+// Route entry for /soul/action/, delegates to the karma yoga module.
+import Index from '../../../sections/soul/action/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('action')) {
+  return Astro.redirect('/soul/', 302);
+}
+---
+
+<Index />

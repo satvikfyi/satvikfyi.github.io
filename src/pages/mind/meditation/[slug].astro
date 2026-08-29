@@ -1,0 +1,13 @@
+---
+// Route entry for /mind/meditation/{slug}/, delegates to the meditation
+// module. getStaticPaths lives in the module page; props flow through.
+export { getStaticPaths } from '../../../sections/mind/meditation/pages/PracticeDetail.astro';
+import PracticeDetail from '../../../sections/mind/meditation/pages/PracticeDetail.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('meditation')) {
+  return Astro.redirect('/mind/', 302);
+}
+---
+
+<PracticeDetail {...Astro.props} />

@@ -1,0 +1,13 @@
+---
+// Route entry for /mind/mantras/{slug}/, delegates to the mantras module.
+// getStaticPaths lives in the module page; props flow through.
+export { getStaticPaths } from '../../../sections/mind/mantras/pages/MantraDetail.astro';
+import MantraDetail from '../../../sections/mind/mantras/pages/MantraDetail.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('mantras')) {
+  return Astro.redirect('/mind/', 302);
+}
+---
+
+<MantraDetail {...Astro.props} />

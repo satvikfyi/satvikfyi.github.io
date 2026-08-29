@@ -1,0 +1,34 @@
+---
+/**
+ * MantraCard, a listing entry. No filter island (the listing groups by
+ * category statically); shows the Devanāgarī text as the visual anchor.
+ */
+import Tag from '../../../../shared/components/Tag.astro';
+import type { Mantra } from '../schemas/mantra';
+import { categoryLabel } from '../lib/domain';
+
+interface Props {
+  mantra: Mantra;
+}
+
+const { mantra } = Astro.props;
+const detailHref = `/mind/mantras/${mantra.slug}/`;
+---
+
+<li
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-indigo/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <div class="mb-2 flex flex-wrap items-center gap-2">
+    <Tag label={mantra.deity} accent="indigo" />
+  </div>
+  <h3 class="font-display text-xl leading-snug font-semibold text-earth">
+    <a href={detailHref} class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2">
+      {mantra.name}
+    </a>
+  </h3>
+  <p lang="sa" class="mt-3 font-display text-lg leading-relaxed text-earth">{mantra.text}</p>
+  <p class="mt-1 text-sm leading-relaxed text-clay italic">{mantra.transliteration}</p>
+  <p class="mt-auto pt-4 text-xs font-medium tracking-wide text-clay uppercase">
+    {mantra.tradition} · {categoryLabel[mantra.category]}
+  </p>
+</li>

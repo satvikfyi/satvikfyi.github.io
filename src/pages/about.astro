@@ -1,0 +1,72 @@
+---
+/**
+ * About, “What is satvik?” The site’s framing, sourcing principles and
+ * non-profit stance.
+ */
+import ArticleLayout from '../shared/layouts/ArticleLayout.astro';
+import { websiteJsonLd, organizationJsonLd } from '../shared/seo/jsonld';
+import { SITE } from '../config/site';
+---
+
+<ArticleLayout
+  title="What is satvik?"
+  description="Satvik (sāttvika) living in the Indian traditions, food, practice and disposition that cultivate clarity and calm, and how this non-profit site presents it."
+  path="/about/"
+  eyebrow="About"
+  jsonLd={[websiteJsonLd(SITE), organizationJsonLd(SITE)]}
+>
+  <p>
+    <strong>Satvik</strong> (<em>sāttvika</em> in IAST transliteration) comes from the Sanskrit word
+    <em>sattva</em>, a quality of clarity, balance and goodness that the Indian traditions describe
+    as one of the three <em>guṇas</em> (qualities of nature), alongside <em>rajas</em> (restlessness,
+    drive) and <em>tamas</em> (dullness, inertia). To live satvik is to cultivate sattva in what you
+    eat, what you do with your body, what you allow into your mind, and how you act in the world.
+  </p>
+  <p>
+    The classical sources describe this in many places: the Bhagavad Gita devotes a whole chapter to
+    how the guṇas colour food, charity, discipline and knowledge; ayurvedic texts explain how food
+    and routine shape the balance of the doshas; the yoga tradition treats posture, breath and
+    meditation as one ascending path. This site gathers that practical wisdom under three pillars, 
+    <a href="/body/">Body</a>, <a href="/mind/">Mind</a> and <a href="/soul/">Soul</a>; with the
+    first module, <a href="/body/meals/">satvik meals</a>, in active build.
+  </p>
+
+  <h2>How we present it</h2>
+  <ul>
+    <li>
+      <strong>Source-first.</strong> Where traditional knowledge is stated, sources are cited; 
+      scripture, classical texts or named modern teachers, and classical sources are kept visibly
+      distinct from modern interpretation.
+    </li>
+    <li>
+      <strong>Non-dogmatic.</strong> The traditions themselves disagree; we present them
+      respectfully, with their own words, without insisting that any single school has the final say.
+    </li>
+    <li>
+      <strong>Sanskrit, readable.</strong> Terms are given in IAST transliteration with plain
+      translations, so the vocabulary stays authentic without becoming a barrier.
+    </li>
+    <li>
+      <strong>Safety-aware.</strong> Ayurveda and yoga are powerful traditions, not substitutes for
+      medical care. Content that touches health carries a
+      <a href="/disclaimer/">disclaimer</a> and advanced practices carry cautions.
+    </li>
+  </ul>
+
+  <h2>What this site is not</h2>
+  <p>
+    Satvik.fyi is a non-profit, volunteer-built project. It carries no advertising, sells nothing
+    through this domain, tracks no one, and collects no personal data. When the shop and community
+    spaces launch they will live on subdomains served by external free services, clearly labelled,
+    never mixed into the reading experience. It is also not a medical, psychological or spiritual
+    advisory service; please read the <a href="/disclaimer/">disclaimer</a>.
+  </p>
+
+  <h2>Content licensing</h2>
+  <p>
+    Original writing on this site is made available under a Creative Commons Attribution
+    (CC BY 4.0) license wherever we hold the rights, in the spirit of freely shared knowledge.
+    Quoted scripture and classical texts remain the heritage of the traditions and are attributed
+    to their sources and translations.
+  </p>
+</ArticleLayout>

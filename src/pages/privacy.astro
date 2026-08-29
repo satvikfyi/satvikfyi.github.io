@@ -1,0 +1,56 @@
+---
+/**
+ * Privacy, the concrete promises of a static, no-backend site.
+ */
+import ArticleLayout from '../shared/layouts/ArticleLayout.astro';
+import { websiteJsonLd } from '../shared/seo/jsonld';
+import { SITE } from '../config/site';
+---
+
+<ArticleLayout
+  title="Privacy"
+  description="Satvik.fyi privacy promise: no trackers, no cookies, no accounts, no personal data. Local storage only, on your device."
+  path="/privacy/"
+  eyebrow="Legal"
+  jsonLd={[websiteJsonLd(SITE)]}
+>
+  <p>
+    This site is built to make a short privacy policy possible. It is a collection of static pages:
+    there is no login, no database, no server-side code processing your requests, and nothing that
+    can identify you.
+  </p>
+
+  <h2>What we do not do</h2>
+  <ul>
+    <li>No advertising or ad trackers of any kind.</li>
+    <li>No analytics cookies, and no other cookies.</li>
+    <li>No accounts, newsletter sign-up forms, or contact forms on this domain.</li>
+    <li>No collection of personal data, not your name, email, or location.</li>
+    <li>No selling or sharing of data, because there is no data to sell.</li>
+  </ul>
+
+  <h2>Local storage (on your device only)</h2>
+  <p>
+    Interactive conveniences, beginning with the weekly meal planner, later the dosha quiz; save
+    your preferences in your browser’s <em>local storage</em> under versioned
+    <code>satvikfyi:…</code> keys. That data never leaves your device, is never transmitted to us,
+    and is removed when you clear your browser storage.
+  </p>
+
+  <h2>Third-party content</h2>
+  <p>
+    Some pages embed YouTube videos using YouTube’s privacy-enhanced
+    (<code>youtube-nocookie.com</code>) mode, which sets no tracking cookies until you play the
+    video. Once you press play, YouTube’s own policies apply. When the newsletter, shop or community
+    spaces launch, they will live on external services reached via clearly labelled subdomains, and
+    their policies will be stated on those services, not here.
+  </p>
+
+  <h2>Hosting and logs</h2>
+  <p>
+    The site is hosted on GitHub Pages. Our hosting provider may keep short-lived, standard
+    technical request logs (as any web server does) for security and abuse prevention; we do not
+    receive or use them. If privacy-friendly, aggregate-only analytics are ever added, this page
+    will say so plainly before they are switched on.
+  </p>
+</ArticleLayout>

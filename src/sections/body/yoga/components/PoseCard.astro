@@ -1,0 +1,51 @@
+---
+/**
+ * PoseCard, a listing entry. Carries the data-* attributes the filter
+ * island filters on, so the markup the server renders is exactly the markup
+ * the island toggles (no-JS shows everything).
+ */
+import Tag from '../../../../shared/components/Tag.astro';
+import type { Pose } from '../schemas/pose';
+import { doshaLabel, poseCategoryLabel, poseLevelLabel } from '../lib/domain';
+
+interface Props {
+  pose: Pose;
+}
+
+const { pose } = Astro.props;
+const detailHref = `/body/yoga/${pose.slug}/`;
+---
+
+<li
+  data-pose-card
+  data-category={pose.category}
+  data-level={pose.level}
+  data-doshas={pose.associatedDoshas.join(',')}
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-saffron/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <div class="mb-2 flex flex-wrap items-center gap-2">
+    <Tag label={poseCategoryLabel[pose.category]} accent="saffron" />
+    <Tag label={poseLevelLabel[pose.level]} />
+  </div>
+  <h3 class="font-display text-xl leading-snug font-semibold text-earth">
+    <a href={detailHref} class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2">
+      {pose.name}
+    </a>
+  </h3>
+  <p class="mt-0.5 text-sm font-medium text-clay italic">{pose.sanskritName}</p>
+  <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-clay">{pose.summary}</p>
+  <ul role="list" class="mt-4 flex flex-wrap gap-1.5" aria-label="Balances">
+    {
+      pose.associatedDoshas.map((dosha) => (
+        <li>
+          <span class="inline-flex items-center rounded-full bg-sage/15 px-2 py-0.5 text-xs font-medium text-sage-deep">
+            Balances {doshaLabel[dosha]}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-auto pt-4 text-xs font-medium tracking-wide text-clay uppercase">
+    {pose.steps.length} steps · {poseLevelLabel[pose.level].toLowerCase()} practice
+  </p>
+</li>

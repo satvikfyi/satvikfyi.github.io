@@ -1,0 +1,12 @@
+---
+// Route entry for /quiz/, delegates to the dosha quiz module (sitewide, no
+// pillar). A disabled module redirects home instead of rendering.
+import Quiz from '../../sections/sitewide/quiz/pages/Quiz.astro';
+import { isModuleEnabled } from '../../config/sections';
+
+if (!isModuleEnabled('quiz')) {
+  return Astro.redirect('/', 302);
+}
+---
+
+<Quiz />

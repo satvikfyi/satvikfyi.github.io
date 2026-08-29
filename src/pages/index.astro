@@ -1,0 +1,190 @@
+---
+/**
+ * Home, pillars intro, meal-planner CTA, roadmap preview. Zero client JS.
+ */
+import BaseLayout from '../shared/layouts/BaseLayout.astro';
+import Card from '../shared/components/Card.astro';
+import Tag from '../shared/components/Tag.astro';
+import { pillars, modules, isModuleEnabled } from '../config/sections';
+import { organizationJsonLd, websiteJsonLd } from '../shared/seo/jsonld';
+import { SITE } from '../config/site';
+
+const roadmap = (pillarId: string) => modules.filter((m) => !m.enabled && m.parent === pillarId);
+const sitewideRoadmap = modules.filter((m) => !m.enabled && m.parent === null);
+// The planner CTA follows the registry: if the meals module is ever disabled,
+// the CTA degrades to the Body pillar instead of pointing at a redirect.
+const plannerHref = isModuleEnabled('meals') ? '/body/meals/' : '/body/';
+---
+
+<BaseLayout
+  path="/"
+  description={SITE.description}
+  jsonLd={[websiteJsonLd(SITE), organizationJsonLd(SITE)]}
+>
+  <!-- Hero -->
+  <section class="border-b border-sand bg-gradient-to-b from-parchment/70 to-cream">
+    <div class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-24">
+      <div class="max-w-3xl">
+        <p class="mb-3 text-sm font-semibold tracking-wide text-saffron-deep uppercase">
+          A non-profit, source-first resource
+        </p>
+        <h1 class="font-display text-4xl leading-tight font-bold text-earth sm:text-5xl">
+          Live satvik: clarity in body, calm in mind, lightness of soul.
+        </h1>
+        <p class="mt-6 text-lg leading-relaxed text-clay">
+          Satvik.fyi gathers the practical wisdom of the Indian traditions: satvik meals, yogasana,
+          ayurveda, pranayama, mantra and the classical paths of yoga, with sources cited, Sanskrit
+          transliterated, and nothing to sell you.
+        </p>
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a
+            href={plannerHref}
+            class="rounded-xl bg-saffron-deep px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+          >
+            Start planning satvik meals
+          </a>
+          <a
+            href="/about/"
+            class="rounded-xl border border-sand bg-cream px-6 py-3 text-sm font-semibold text-earth transition-colors hover:border-saffron/60 hover:bg-parchment"
+          >
+            What is satvik living?
+          </a>
+        </div>
+        <ul class="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-sm text-clay" aria-label="Site principles">
+          <li>Source-first</li>
+          <li aria-hidden="true">·</li>
+          <li>Non-dogmatic</li>
+          <li aria-hidden="true">·</li>
+          <li>Privacy-first, no trackers, no cookies</li>
+          <li aria-hidden="true">·</li>
+          <li>Free, always</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pillars -->
+  <section aria-labelledby="pillars-heading" class="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+    <h2 id="pillars-heading" class="font-display text-2xl font-bold text-earth sm:text-3xl">
+      Three pillars, one way of living
+    </h2>
+    <p class="mt-3 max-w-2xl text-base leading-relaxed text-clay">
+      The classical traditions describe the person in layers, food-fed body, breath-touched mind,
+      and something quieter beneath both. This site is organised exactly that way.
+    </p>
+    <ul role="list" class="mt-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+      {
+        pillars.map((pillar) => {
+          const live = modules.filter((m) => m.enabled && m.parent === pillar.id);
+          const planned = roadmap(pillar.id);
+          return (
+            <li>
+              <Card
+                href={pillar.routePrefix}
+                eyebrow="Pillar"
+                title={pillar.title}
+                description={pillar.description}
+                accent={pillar.accent ?? 'saffron'}
+                footerNote={
+                  live.length > 0
+                    ? `Now: ${live.map((m) => m.title).join(', ')}`
+                    : `${planned.length} modules on the roadmap`
+                }
+              />
+            </li>
+          );
+        })
+      }
+    </ul>
+  </section>
+
+  <!-- Roadmap -->
+  <section aria-labelledby="roadmap-heading" class="border-t border-sand bg-parchment/40">
+    <div class="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+      <div class="flex flex-wrap items-baseline justify-between gap-4">
+        <h2 id="roadmap-heading" class="font-display text-2xl font-bold text-earth sm:text-3xl">
+          Growing one module at a time
+        </h2>
+        <Tag label="Full sitemap provisioned" accent="sage" />
+      </div>
+      <p class="mt-3 max-w-2xl text-base leading-relaxed text-clay">
+        Every feature of the site is a module under a pillar. The meal planner under Body is first;
+        the rest are registered below and switch on as each is built, checked and sourced.
+      </p>
+      <div class="mt-10 grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+        {
+          pillars.map((pillar) => (
+            <div>
+              <h3 class="text-sm font-semibold tracking-wide text-earth uppercase">{pillar.title}</h3>
+              <ul role="list" class="mt-3 space-y-2">
+                {modules
+                  .filter((m) => m.parent === pillar.id)
+                  .map((m) => (
+                    <li class="flex items-center gap-2 text-sm">
+                      <span
+                        class:list={[
+                          'inline-block h-1.5 w-1.5 rounded-full',
+                          m.enabled ? 'bg-sage-deep' : 'bg-sand',
+                        ]}
+                        aria-hidden="true"
+                      />
+                      <span class:list={[m.enabled ? 'text-earth' : 'text-clay']}>
+                        {m.title}
+                        <span class="sr-only">{m.enabled ? ' (live)' : ' (registered, coming later)'}</span>
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          ))
+        }
+        <div>
+          <h3 class="text-sm font-semibold tracking-wide text-earth uppercase">Sitewide</h3>
+          <ul role="list" class="mt-3 space-y-2">
+            {
+              sitewideRoadmap.map((m) => (
+                <li class="flex items-center gap-2 text-sm text-clay">
+                  <span class="inline-block h-1.5 w-1.5 rounded-full bg-sand" aria-hidden="true" />
+                  <span>
+                    {m.title}
+                    <span class="sr-only"> (registered, coming later)</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Values -->
+  <section aria-labelledby="values-heading" class="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20">
+    <h2 id="values-heading" class="font-display text-2xl font-bold text-earth sm:text-3xl">
+      How this site treats the traditions, and you
+    </h2>
+    <div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h3 class="font-display text-lg font-semibold text-earth">Scripture ≠ interpretation</h3>
+        <p class="mt-2 text-sm leading-relaxed text-clay">
+          Classical sources are cited and set apart from modern commentary, so you always know
+          which voice is speaking.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h3 class="font-display text-lg font-semibold text-earth">Sanskrit, readable</h3>
+        <p class="mt-2 text-sm leading-relaxed text-clay">
+          Terms appear in IAST transliteration (like <em>yajña</em> or <em>prāṇāyāma</em>) with
+          approachable translations alongside.
+        </p>
+      </div>
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h3 class="font-display text-lg font-semibold text-earth">Your data stays yours</h3>
+        <p class="mt-2 text-sm leading-relaxed text-clay">
+          A static site with no accounts and no trackers. Planner and quiz preferences live in your
+          browser’s local storage and nowhere else.
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,154 @@
+---
+/**
+ * Wiki article page, the entry itself (markdown body in ArticleLayout
+ * prose), related articles resolved through the slug map, backlinks
+ * (articles referencing this one), references, and category navigation.
+ * Routed via src/pages/wiki/[category]/[slug].astro (thin wrapper).
+ */
+import { render } from 'astro:content';
+import ArticleLayout from '../../../../shared/layouts/ArticleLayout.astro';
+import ExternalLink from '../../../../shared/components/ExternalLink.astro';
+import { breadcrumbJsonLd, articleJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { articleMap, backlinksTo, wikiEnabled } from '../lib/articles';
+import type { WikiEntry } from '../lib/articles';
+import { articleHref, categoryHref, categoryLabel } from '../lib/domain';
+import type { WikiCategory } from '../lib/domain';
+
+export async function getStaticPaths() {
+  if (!wikiEnabled()) return [];
+  const map = await articleMap();
+  return [...map.values()].map((entry) => ({
+    params: { category: entry.data.category, slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: WikiEntry;
+}
+
+const { entry } = Astro.props;
+const article = entry.data;
+const { Content } = await render(entry);
+const category = article.category as WikiCategory;
+const path = articleHref(category, article.slug);
+
+const map = await articleMap();
+const related = article.related
+  .map((slug) => map.get(slug))
+  .filter((e): e is WikiEntry => !!e);
+const mentioning = (await backlinksTo(article.slug)).filter((e) => e.data.slug !== article.slug);
+const siblings = [...map.values()]
+  .filter((e) => e.data.category === category && e.data.slug !== article.slug)
+  .sort((a, b) => a.data.title.localeCompare(b.data.title, 'en'));
+---
+
+<ArticleLayout
+  title={article.title}
+  description={article.summary}
+  path={path}
+  eyebrow={`Wiki · ${categoryLabel[category]}`}
+  jsonLd={[
+    articleJsonLd({
+      siteName: SITE.name,
+      siteUrl: SITE.url,
+      title: article.title,
+      description: article.summary,
+      path,
+    }),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Wiki', path: '/wiki/' },
+      { name: categoryLabel[category], path: categoryHref(category) },
+      { name: article.title, path },
+    ]),
+  ]}
+>
+  <Content />
+
+  {
+    related.length > 0 && (
+      <section aria-labelledby="related-heading" class="not-prose mt-10 rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 id="related-heading" class="font-display text-lg font-bold text-earth">Related entries</h2>
+        <ul role="list" class="mt-3 space-y-2 text-sm">
+          {related.map((rel) => (
+            <li>
+              <a
+                href={articleHref(rel.data.category, rel.data.slug)}
+                class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep"
+              >
+                {rel.data.title}
+              </a>
+              <span class="text-clay">, {rel.data.summary}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    mentioning.length > 0 && (
+      <section aria-labelledby="backlinks-heading" class="not-prose mt-6 rounded-2xl border border-sand bg-cream p-6">
+        <h2 id="backlinks-heading" class="font-display text-lg font-bold text-earth">Mentioned in</h2>
+        <ul role="list" class="mt-3 flex flex-wrap gap-2 text-sm">
+          {mentioning.map((ref) => (
+            <li>
+              <a
+                href={articleHref(ref.data.category, ref.data.slug)}
+                class="inline-flex items-center rounded-full bg-sage/15 px-3 py-1 font-medium text-sage-deep hover:bg-sage/25"
+              >
+                {ref.data.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  {
+    article.references.length > 0 && (
+      <section aria-labelledby="references-heading" class="not-prose mt-6">
+        <h2 id="references-heading" class="font-display text-lg font-bold text-earth">References</h2>
+        <ul role="list" class="mt-3 space-y-2 text-sm leading-relaxed text-clay">
+          {article.references.map((reference) => (
+            <li class="flex gap-2">
+              <span aria-hidden="true" class="mt-0.5 text-sage-deep">◆</span>
+              <span>
+                {reference.url ? (
+                  <ExternalLink href={reference.url} class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2">
+                    {reference.title}
+                  </ExternalLink>
+                ) : (
+                  <span class="font-medium text-earth">{reference.title}</span>
+                )}
+                {reference.author && <span>, {reference.author}</span>}
+                {reference.reference && <span class="italic"> ({reference.reference})</span>}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+
+  <nav aria-label="Wiki navigation" class="not-prose mt-10 border-t border-sand pt-6 text-sm">
+    <p>
+      <a href={categoryHref(category)} class="font-semibold text-sage-deep underline decoration-sage/60 underline-offset-4 hover:decoration-sage-deep">
+        ← All {categoryLabel[category].toLowerCase()}
+      </a>
+    </p>
+    {
+      siblings.length > 0 && (
+        <p class="mt-2 text-clay">
+          Next in {categoryLabel[category].toLowerCase()}:{' '}
+          <a href={articleHref(siblings[0].data.category, siblings[0].data.slug)} class="font-medium text-earth underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep">
+            {siblings[0].data.title}
+          </a>
+        </p>
+      )
+    }
+  </nav>
+</ArticleLayout>

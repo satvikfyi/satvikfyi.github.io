@@ -1,0 +1,14 @@
+---
+// Route entry for /body/yoga/{slug}/, delegates to the yoga module.
+// getStaticPaths lives in the module page (returning no paths at all when
+// the module is disabled); props flow through to it untouched.
+export { getStaticPaths } from '../../../sections/body/yoga/pages/PoseDetail.astro';
+import PoseDetail from '../../../sections/body/yoga/pages/PoseDetail.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('yoga')) {
+  return Astro.redirect('/body/', 302);
+}
+---
+
+<PoseDetail {...Astro.props} />

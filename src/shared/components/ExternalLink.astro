@@ -1,0 +1,18 @@
+---
+/**
+ * ExternalLink, target=_blank with the required safety and accessibility
+ * treatment: rel="noopener noreferrer" and a screen-reader note.
+ */
+interface Props {
+  href: string;
+  class?: string;
+}
+
+const { href, class: className = '' } = Astro.props;
+---
+
+<a href={href} target="_blank" rel="noopener noreferrer" class={className}>
+  <slot />
+  <span class="sr-only">(opens in a new tab)</span>
+  <span aria-hidden="true">&nbsp;↗</span>
+</a>

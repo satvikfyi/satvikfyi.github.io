@@ -1,0 +1,12 @@
+---
+// Route entry for /blog/tag/{tag}/, delegates to the blog module.
+export { getStaticPaths } from '../../../sections/sitewide/blog/pages/TagIndex.astro';
+import TagIndex from '../../../sections/sitewide/blog/pages/TagIndex.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('blog')) {
+  return Astro.redirect('/blog/', 302);
+}
+---
+
+<TagIndex {...Astro.props} />

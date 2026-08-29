@@ -1,0 +1,113 @@
+---
+/**
+ * Mantras module listing, grouped statically by category, in the order the
+ * categories are declared in the domain. Zero client JavaScript.
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import MantraCard from '../components/MantraCard.astro';
+import config from '../module.config';
+import { MANTRA_CATEGORIES, categoryIntro, categoryLabel } from '../lib/domain';
+
+const entries = await getCollection('mantras');
+const mantras = entries.map((entry) => entry.data);
+const groups = MANTRA_CATEGORIES.map((category) => ({
+  category,
+  items: mantras
+    .filter((m) => m.category === category)
+    .sort((a, b) => a.name.localeCompare(b.name, 'en')),
+})).filter((group) => group.items.length > 0);
+const total = mantras.length;
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Mantras"
+  eyebrow="Mind · Sacred sound"
+  lede={`${total} mantras with their Devanāgarī text, IAST transliteration, meaning, meter and traditional usage; from the praṇava Oṁ to the mahā-mantra, each cited to its source and some with a free recording to chant along with.`}
+  path={config.routePrefix}
+  accent="indigo"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Mind', path: '/mind/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="lg:col-span-2 space-y-12">
+      {
+        groups.map(({ category, items }) => (
+          <section aria-labelledby={`group-${category}`}>
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <h2 id={`group-${category}`} class="font-display text-2xl font-bold text-earth">
+                {categoryLabel[category]}
+              </h2>
+              <p class="text-xs text-clay">{categoryIntro[category]}</p>
+            </div>
+            <ul role="list" class="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2">
+              {items.map((mantra) => (
+                <MantraCard mantra={mantra} />
+              ))}
+            </ul>
+          </section>
+        ))
+      }
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">How mantras are used</h2>
+        <ul role="list" class="mt-3 space-y-2 text-sm leading-relaxed text-clay">
+          <li><strong class="font-semibold text-earth">Japa</strong>, silent repetition, traditionally counted on a 108-bead mala.</li>
+          <li><strong class="font-semibold text-earth">Kīrtana</strong>, sung aloud together; the heart of group practice.</li>
+          <li><strong class="font-semibold text-earth">Stuti</strong>, recited as poetry, heard as much as said.</li>
+        </ul>
+        <p class="mt-3 text-xs leading-relaxed text-clay">
+          Certain mantras are traditionally received from a teacher; where that applies, the entry says so.
+        </p>
+      </div>
+
+      {isModuleEnabled('meditation') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Japa as meditation</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            Repetition becomes meditation when the sound carries the attention, the meditation module
+            teaches the sitting it lives in.
+          </p>
+          <a
+            href="/mind/meditation/japa-meditation/"
+            class="mt-4 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep"
+          >
+            Mantra meditation →
+          </a>
+        </div>
+      )}
+
+      {isModuleEnabled('soul-meditation') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Where repetition leads</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            In Patañjali's eight limbs, the mantra is a vehicle toward dhāraṇā and dhyāna; the soul
+            pillar's ashtanga pages map that climb.
+          </p>
+          <a
+            href="/soul/meditation/"
+            class="mt-4 inline-block text-sm font-semibold text-plum-deep underline decoration-plum/60 underline-offset-4 hover:decoration-plum-deep"
+          >
+            The eight limbs →
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</PageLayout>

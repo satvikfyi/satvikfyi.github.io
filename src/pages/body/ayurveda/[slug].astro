@@ -1,0 +1,14 @@
+---
+// Route entry for /body/ayurveda/{slug}/, delegates to the ayurveda module.
+// getStaticPaths lives in the module page (returning no paths at all when
+// the module is disabled); props flow through to it untouched.
+export { getStaticPaths } from '../../../sections/body/ayurveda/pages/EntryDetail.astro';
+import EntryDetail from '../../../sections/body/ayurveda/pages/EntryDetail.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('ayurveda')) {
+  return Astro.redirect('/body/', 302);
+}
+---
+
+<EntryDetail {...Astro.props} />

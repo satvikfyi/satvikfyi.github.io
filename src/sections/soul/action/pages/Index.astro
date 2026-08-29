@@ -1,0 +1,109 @@
+---
+/**
+ * Karma Yoga overview, curated page with the Gītā's own verses, rendered
+ * from the shared soul-teachings collection. Routed via
+ * src/pages/soul/action/index.astro (thin wrapper).
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import TeachingArticle from '../../paths/components/TeachingArticle.astro';
+import SiblingPaths from '../../paths/components/SiblingPaths.astro';
+import config from '../module.config';
+
+const teachings = (await getCollection('soul-teachings'))
+  .filter((entry) => entry.data.path === 'action')
+  .sort((a, b) => a.data.reference.localeCompare(b.data.reference, 'en'));
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Karma Yoga, the path of action"
+  eyebrow="Soul · Action"
+  lede="Most of us cannot retire to a cave; the Gītā was spoken to a soldier at a battlefield's edge, and its answer is work, but work transformed. Karma yoga is the discipline of acting whole-heartedly without being owned by the outcome."
+  path={config.routePrefix}
+  accent="plum"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Soul', path: '/soul/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="space-y-10 lg:col-span-2">
+      <section aria-labelledby="essence-heading" class="space-y-4">
+        <h2 id="essence-heading" class="font-display text-2xl font-bold text-earth">The essence</h2>
+        <p class="leading-relaxed text-clay">
+          The Bhagavad Gītā's battlefield is every kitchen, office and school run. Arjuna wants to
+          abandon his work in the name of spirituality; Kṛṣṇa spends eighteen chapters talking him
+          back into it, cleansed of the two poisons that spoil work: attachment to results, and
+          attachment to being the doer.
+        </p>
+        <p class="leading-relaxed text-clay">
+          The path is therefore available to everyone with a life, which is what the tradition means
+          by calling it the yoga for the householder. The measure of progress is strangely practical:
+          the same work gets done with less internal noise.
+        </p>
+      </section>
+
+      <section aria-labelledby="practice-heading" class="space-y-4">
+        <h2 id="practice-heading" class="font-display text-2xl font-bold text-earth">The path in practice</h2>
+        <ul role="list" class="grid grid-cols-1 gap-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2">
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Do the day's work completely, as an offering rather than a trade.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Notice the mind rehearsing outcomes, and return to the task at hand.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Give the fruit away in advance, to God, to the work, to the world.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Serve (sevā) without accounting: someone's need is the whole reason.</span></li>
+        </ul>
+      </section>
+
+      <section aria-labelledby="teachings-heading" class="space-y-5">
+        <h2 id="teachings-heading" class="font-display text-2xl font-bold text-earth">From the tradition</h2>
+        {teachings.map((entry) => <TeachingArticle entry={entry} />)}
+      </section>
+
+      {isModuleEnabled('meals') && (
+        <section aria-labelledby="kitchen-heading" class="space-y-3">
+          <h2 id="kitchen-heading" class="font-display text-2xl font-bold text-earth">Karma yoga in the kitchen</h2>
+          <p class="leading-relaxed text-clay">
+            The tradition's own laboratory for offered work is cooking, attention, cleanliness, and
+            food made for others. The recipe collection was built on exactly that spirit.
+          </p>
+          <a
+            href="/body/meals/"
+            class="inline-block text-sm font-semibold text-saffron-deep underline decoration-saffron/60 underline-offset-4 hover:decoration-saffron-deep"
+          >
+            The satvik recipe collection →
+          </a>
+        </section>
+      )}
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <SiblingPaths current="action" />
+      {isModuleEnabled('mantras') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Work as worship</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            Many karma yogis frame the day with a mantra before beginning, the mantra collection
+            includes several fit for the threshold.
+          </p>
+          <a
+            href="/mind/mantras/"
+            class="mt-4 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep"
+          >
+            Browse mantras →
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</PageLayout>

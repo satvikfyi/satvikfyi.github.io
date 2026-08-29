@@ -1,0 +1,272 @@
+---
+/**
+ * Ayurveda entry detail, energetics (tastes, properties, dosha effects),
+ * traditional indications, contraindications, preparation and sources, with
+ * the mandatory ayurvedic disclaimer. Cross-module links are plain URLs only
+ * (meals / yoga with ?dosha=, quiz). Routed via src/pages/body/ayurveda/[slug].astro.
+ */
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import Tag from '../../../../shared/components/Tag.astro';
+import ExternalLink from '../../../../shared/components/ExternalLink.astro';
+import { breadcrumbJsonLd, articleJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import DoshaEffectChips from '../components/DoshaEffectChips.astro';
+import config from '../module.config';
+import { DOSHAS, doshaLabel, entryKindLabel, propertyLabel, tasteLabel } from '../lib/domain';
+
+export async function getStaticPaths() {
+  // Disabled module → no detail pages are built at all.
+  if (!isModuleEnabled('ayurveda')) return [];
+  const entries = await getCollection('ayurveda-entries');
+  return entries.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'ayurveda-entries'>;
+}
+
+const { entry } = Astro.props;
+const item = entry.data;
+const { Content } = await render(entry);
+const hasBody = typeof entry.body === 'string' && entry.body.trim().length > 0;
+const path = `/body/ayurveda/${item.slug}/`;
+
+const balancing = DOSHAS.filter((d) => item.doshaEffects[d] === 'balancing');
+---
+
+<PageLayout
+  title={item.sanskritName ? `${item.name} (${item.sanskritName})` : item.name}
+  description={item.summary}
+  heading={item.name}
+  eyebrow={`Body · Ayurveda · ${entryKindLabel[item.kind]}`}
+  path={path}
+  type="article"
+  accent="saffron"
+  jsonLd={[
+    articleJsonLd({
+      siteName: SITE.name,
+      siteUrl: SITE.url,
+      title: item.sanskritName ? `${item.name} (${item.sanskritName})` : item.name,
+      description: item.summary,
+      path,
+    }),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Body', path: '/body/' },
+      { name: config.title, path: config.routePrefix },
+      { name: item.name, path },
+    ]),
+  ]}
+>
+  <nav aria-label="Breadcrumb" class="mb-6">
+    <ol class="flex flex-wrap items-center gap-2 text-sm text-clay">
+      <li><a href="/" class="hover:text-saffron-deep hover:underline">Home</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/body/" class="hover:text-saffron-deep hover:underline">Body</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/body/ayurveda/" class="hover:text-saffron-deep hover:underline">Ayurveda</a></li>
+      <li aria-hidden="true">/</li>
+      <li aria-current="page" class="font-medium text-earth">{item.name}</li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+    <article class="lg:col-span-2">
+      {item.sanskritName && <p class="font-display text-xl text-clay italic">{item.sanskritName}</p>}
+      <p class="mt-4 text-lg leading-relaxed text-clay">{item.summary}</p>
+      <p class="mt-3 flex flex-wrap items-center gap-2 text-sm font-medium text-clay">
+        <span>{entryKindLabel[item.kind]} · {item.partUsed}</span>
+      </p>
+
+      <section aria-labelledby="energetics-heading" class="mt-10">
+        <h2 id="energetics-heading" class="font-display text-2xl font-bold text-earth">Energetics</h2>
+        <div class="mt-4 rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h3 class="text-xs font-semibold tracking-wide text-clay uppercase">Taste (rasa)</h3>
+          <ul role="list" class="mt-2 flex flex-wrap gap-2">
+            {item.tastes.map((taste) => (
+              <li><Tag label={tasteLabel[taste]} accent="saffron" /></li>
+            ))}
+          </ul>
+          <h3 class="mt-5 text-xs font-semibold tracking-wide text-clay uppercase">Properties (guṇa / vīrya)</h3>
+          <ul role="list" class="mt-2 flex flex-wrap gap-2">
+            {item.properties.map((property) => (
+              <li><Tag label={propertyLabel[property]} /></li>
+            ))}
+          </ul>
+          <h3 class="mt-5 text-xs font-semibold tracking-wide text-clay uppercase">Dosha effect</h3>
+          <div class="mt-2">
+            <DoshaEffectChips effects={item.doshaEffects} />
+          </div>
+        </div>
+      </section>
+
+      <section aria-labelledby="indications-heading" class="mt-10">
+        <h2 id="indications-heading" class="font-display text-2xl font-bold text-earth">Traditional indications</h2>
+        <ul role="list" class="mt-4 space-y-2">
+          {
+            item.indications.map((indication) => (
+              <li class="flex gap-2 text-sm leading-relaxed text-earth">
+                <span aria-hidden="true" class="mt-0.5 text-sage-deep">◆</span>
+                <span>{indication}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-3 text-xs leading-relaxed text-clay">
+          Indications record traditional ayurvedic usage for study, they are not medical claims and
+          not a recommendation to treat yourself.
+        </p>
+      </section>
+
+      {
+        item.contraindications.length > 0 && (
+          <section aria-labelledby="contra-heading" class="mt-10">
+            <h2 id="contra-heading" class="font-display text-2xl font-bold text-earth">Contraindications &amp; cautions</h2>
+            <ul role="list" class="mt-4 space-y-2 rounded-2xl border border-plum/30 bg-plum/5 p-6">
+              {item.contraindications.map((caution) => (
+                <li class="flex gap-2 text-sm leading-relaxed text-earth">
+                  <span aria-hidden="true" class="mt-0.5 font-bold text-plum-deep">!</span>
+                  <span>{caution}</span>
+                </li>
+              ))}
+            </ul>
+            <p class="mt-3 text-xs leading-relaxed text-clay">
+              Herbs interact with medications, conditions and pregnancy; review anything here with a
+              qualified practitioner before use.
+            </p>
+          </section>
+        )
+      }
+
+      <section aria-labelledby="preparation-heading" class="mt-10">
+        <h2 id="preparation-heading" class="font-display text-2xl font-bold text-earth">Traditional preparation</h2>
+        <p class="mt-4 rounded-2xl border border-sand bg-parchment/60 p-6 text-sm leading-relaxed text-earth">
+          {item.preparation}
+        </p>
+      </section>
+
+      {
+        hasBody && (
+          <section aria-labelledby="tradition-heading" class="mt-10">
+            <h2 id="tradition-heading" class="font-display text-2xl font-bold text-earth">In the tradition</h2>
+            <div class="prose prose-earth mt-4 max-w-none prose-headings:font-display prose-a:text-saffron-deep">
+              <Content />
+            </div>
+          </section>
+        )
+      }
+
+      {
+        item.sources.length > 0 && (
+          <section aria-labelledby="sources-heading" class="mt-10">
+            <h2 id="sources-heading" class="font-display text-2xl font-bold text-earth">Sources &amp; further reading</h2>
+            <ul role="list" class="mt-4 space-y-2 text-sm leading-relaxed text-clay">
+              {item.sources.map((source) => (
+                <li class="flex gap-2">
+                  <span aria-hidden="true" class="mt-0.5 text-saffron-deep">◆</span>
+                  <span>
+                    {source.url ? (
+                      <ExternalLink href={source.url} class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2">
+                        {source.title}
+                      </ExternalLink>
+                    ) : (
+                      <span class="font-medium text-earth">{source.title}</span>
+                    )}
+                    {source.author && <span>, {source.author}</span>}
+                    {source.reference && <span class="italic"> ({source.reference})</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p class="mt-3 text-xs leading-relaxed text-clay">
+              Classical citations mark where a tradition is drawn on; modern references are further
+              reading, never prescriptions.
+            </p>
+          </section>
+        )
+      }
+
+      <div class="mt-10">
+        <Disclaimer variant="ayurveda" />
+      </div>
+    </article>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      {balancing.length > 0 && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Pair it with your plate</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            Traditionally, food, herbs and movement are adjusted together. Browse the collection that
+            balances {balancing.map((d) => doshaLabel[d]).join(' and ')} the same way this entry does.
+          </p>
+          <ul role="list" class="mt-4 space-y-2 text-sm">
+            {isModuleEnabled('meals') && balancing.map((dosha) => (
+              <li>
+                <a
+                  href={`/body/meals/?dosha=${dosha}`}
+                  class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep"
+                >
+                  Recipes balancing {doshaLabel[dosha]}
+                </a>
+              </li>
+            ))}
+            {isModuleEnabled('yoga') && balancing.map((dosha) => (
+              <li>
+                <a
+                  href={`/body/yoga/?dosha=${dosha}`}
+                  class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep"
+                >
+                  Poses balancing {doshaLabel[dosha]}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {isModuleEnabled('quiz') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Find your dosha</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            A few quiet questions about body, energy and mind; the result personalises the filters
+            here, the poses and the meal planner, and never leaves this device.
+          </p>
+          <a
+            href="/quiz/"
+            class="mt-4 inline-block rounded-xl border border-sand bg-cream px-5 py-2.5 text-sm font-semibold text-earth transition-colors hover:border-saffron/60 hover:text-saffron-deep"
+          >
+            Take the dosha quiz
+          </a>
+        </div>
+      )}
+
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Browse the collection</h2>
+        <ul role="list" class="mt-3 space-y-1.5 text-sm">
+          <li>
+            <a href="/body/ayurveda/" class="font-medium text-earth underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep">
+              All herbs &amp; ingredients
+            </a>
+          </li>
+          {DOSHAS.map((dosha) => (
+            <li>
+              <a
+                href={`/body/ayurveda/?dosha=${dosha}`}
+                class="font-medium text-earth underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep"
+              >
+                Entries balancing {doshaLabel[dosha]}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </aside>
+  </div>
+</PageLayout>

@@ -1,0 +1,149 @@
+---
+/**
+ * Post detail, the reading page: ArticleLayout prose, linked tags,
+ * JSON-LD Article, optional og:image, prev/next navigation and the
+ * opt-in lazy Giscus comments section.
+ * Routed via src/pages/blog/[slug].astro (thin wrapper).
+ */
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import ArticleLayout from '../../../../shared/layouts/ArticleLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { breadcrumbJsonLd, articleJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { publishedPosts, blogEnabled } from '../lib/posts';
+import { formatDate } from '../lib/domain';
+import type { Post } from '../schemas/post';
+
+export async function getStaticPaths() {
+  if (!blogEnabled()) return [];
+  const posts = await publishedPosts();
+  return posts.map((post, index) => ({
+    params: { slug: post.data.slug },
+    props: { entry: post, newer: posts[index - 1]?.data ?? null, older: posts[index + 1]?.data ?? null },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'blog-posts'>;
+  newer: Post | null;
+  older: Post | null;
+}
+
+const { entry, newer, older } = Astro.props;
+const post = entry.data;
+const { Content } = await render(entry);
+const path = `/blog/${post.slug}/`;
+const ogImage = post.coverImage ? `${SITE.url}/assets/images/blog/${post.coverImage}` : undefined;
+const giscus = SITE.giscus;
+---
+
+<ArticleLayout
+  title={post.title}
+  description={post.excerpt}
+  path={path}
+  eyebrow="Blog"
+  datePublished={post.date}
+  dateModified={post.updated}
+  tags={post.tags}
+  tagLinkPrefix="/blog/tag/"
+  image={ogImage}
+  jsonLd={[
+    articleJsonLd({
+      siteName: SITE.name,
+      siteUrl: SITE.url,
+      title: post.title,
+      description: post.excerpt,
+      path,
+      datePublished: post.date,
+      dateModified: post.updated ?? post.date,
+    }),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog/' },
+      { name: post.title, path },
+    ]),
+  ]}
+>
+  {post.coverImage && (
+    <img
+      src={`/assets/images/blog/${post.coverImage}`}
+      alt=""
+      class="mb-8 aspect-[2/1] w-full rounded-2xl border border-sand object-cover"
+      loading="eager"
+    />
+  )}
+
+  <Content />
+
+  <footer class="mt-10 border-t border-sand pt-6 not-prose">
+    <p class="text-sm text-clay">
+      By {post.author}
+      {post.updated && post.updated !== post.date ? ` · updated ${formatDate(post.updated)}` : ''}
+    </p>
+
+    <nav aria-label="More posts" class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {
+        older ? (
+          <a
+            href={`/blog/${older.slug}/`}
+            class="rounded-2xl border border-sand bg-parchment/60 p-5 transition-colors hover:border-sage/60"
+          >
+            <span class="text-xs font-semibold tracking-wide text-clay uppercase">Older</span>
+            <span class="mt-1 block font-display text-base font-semibold text-earth">{older.title}</span>
+          </a>
+        ) : (
+          <span aria-hidden="true" />
+        )
+      }
+      {
+        newer && (
+          <a
+            href={`/blog/${newer.slug}/`}
+            class="rounded-2xl border border-sand bg-parchment/60 p-5 text-right transition-colors hover:border-sage/60 sm:col-start-2"
+          >
+            <span class="text-xs font-semibold tracking-wide text-clay uppercase">Newer</span>
+            <span class="mt-1 block font-display text-base font-semibold text-earth">{newer.title}</span>
+          </a>
+        )
+      }
+    </nav>
+
+    {
+      post.comments && (
+        <section aria-labelledby="comments-heading" class="mt-10">
+          <h2 id="comments-heading" class="font-display text-2xl font-bold text-earth">Comments</h2>
+          <p class="mt-1 text-sm leading-relaxed text-clay">
+            Powered by Giscus (GitHub Discussions), loaded only when you reach this point, and free of
+            our own trackers. Be kind; the tradition is watching.
+          </p>
+          <div
+            id="comments-mount"
+            class="mt-4 min-h-16"
+            data-giscus-repo={giscus.repo}
+            data-giscus-repo-id={giscus.repoId}
+            data-giscus-category={giscus.category}
+            data-giscus-category-id={giscus.categoryId}
+          >
+            <p class="rounded-2xl border border-sand bg-parchment/60 p-5 text-sm text-clay">
+              <span class="sr-only">Loading comments, </span>Comments load here when you scroll.
+            </p>
+          </div>
+        </section>
+      )
+    }
+
+    <div class="mt-10">
+      <Disclaimer variant="general" />
+    </div>
+  </footer>
+</ArticleLayout>
+
+{
+  post.comments && (
+    <script>
+      import { mountComments } from '../components/Comments';
+      mountComments(document.getElementById('comments-mount'));
+    </script>
+  )
+}

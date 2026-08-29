@@ -1,0 +1,11 @@
+---
+// Route entry for /soul/knowledge/, delegates to the gyan yoga module.
+import Index from '../../../sections/soul/knowledge/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('knowledge')) {
+  return Astro.redirect('/soul/', 302);
+}
+---
+
+<Index />

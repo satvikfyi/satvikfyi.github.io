@@ -1,0 +1,52 @@
+---
+/**
+ * Contact, no forms by design (static, privacy-first site). Points to
+ * email and future external spaces.
+ */
+import PageLayout from '../shared/layouts/PageLayout.astro';
+import ExternalLink from '../shared/components/ExternalLink.astro';
+import { SITE } from '../config/site';
+import { websiteJsonLd } from '../shared/seo/jsonld';
+---
+
+<PageLayout
+  title="Contact"
+  description="How to reach Satvik.fyi, email for corrections, sources and suggestions. No forms, no tracking."
+  path="/contact/"
+  eyebrow="Contact"
+  lede="Found a mistranslation? A missing source? A practice that deserves more care? These pages improve through exactly that kind of mail."
+  jsonLd={[websiteJsonLd(SITE)]}
+>
+  <div class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+      <h2 class="font-display text-lg font-semibold text-earth">Email</h2>
+      <p class="mt-2 text-sm leading-relaxed text-clay">
+        The simplest way to reach the maintainers, corrections, source suggestions and kind
+        feedback all welcome.
+      </p>
+      <a
+        href={`mailto:${SITE.contactEmail}`}
+        class="mt-4 inline-block text-sm font-semibold text-saffron-deep underline decoration-saffron/60 underline-offset-4 hover:decoration-saffron-deep"
+      >
+        {SITE.contactEmail}
+      </a>
+    </div>
+    <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+      <h2 class="font-display text-lg font-semibold text-earth">Corrections policy</h2>
+      <p class="mt-2 text-sm leading-relaxed text-clay">
+        When we get a citation or translation wrong, we fix the page and note the change. When a
+        tradition is misrepresented, we consult the sources again before writing back.
+      </p>
+    </div>
+  </div>
+
+  <div class="mt-6 rounded-2xl border border-dashed border-sand bg-parchment/50 p-6">
+    <h2 class="font-display text-lg font-semibold text-earth">Why no contact form?</h2>
+    <p class="mt-2 max-w-2xl text-sm leading-relaxed text-clay">
+      This is a static site: no server, no database, no personal data stored. Forms would require
+      both. A mailbox does the same job without either. When the newsletter and community spaces
+      launch, they will live with external services (Substack, Discord or similar) on their own
+      terms, linked from the <ExternalLink class="text-saffron-deep underline underline-offset-4" href="https://substack.com">footer</ExternalLink>, never embedded here.
+    </p>
+  </div>
+</PageLayout>

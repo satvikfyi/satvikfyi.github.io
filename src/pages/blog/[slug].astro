@@ -1,0 +1,13 @@
+---
+// Route entry for /blog/{slug}/, delegates to the blog module.
+// getStaticPaths lives in the module page; props flow through.
+export { getStaticPaths } from '../../sections/sitewide/blog/pages/PostDetail.astro';
+import PostDetail from '../../sections/sitewide/blog/pages/PostDetail.astro';
+import { isModuleEnabled } from '../../config/sections';
+
+if (!isModuleEnabled('blog')) {
+  return Astro.redirect('/', 302);
+}
+---
+
+<PostDetail {...Astro.props} />

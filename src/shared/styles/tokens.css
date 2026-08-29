@@ -1,0 +1,95 @@
+/*
+ * Design tokens, Tailwind CSS v4, CSS-first configuration.
+ *
+ * This file is the single source of truth for the satvik palette and the
+ * type stacks. Tailwind v4 consumes the `@theme` block directly (no
+ * tailwind.config.ts); every token becomes a utility (bg-cream, text-earth,
+ * font-display, …).
+ *
+ * Palette rules:
+ *  - `*-deep` tokens are text-safe (WCAG AA ≥ 4.5:1 on cream/parchment).
+ *  - Plain tokens (saffron, sage, …) are for decorative accents, borders
+ *    and large type only.
+ *  - Font stacks put system fonts first for speed and privacy (zero
+ *    external requests), with Noto Sans/Serif after them so IAST
+ *    transliteration glyphs (ā ī ū ṛ ṣ ṭ ṅ ñ ś ṁ ḥ) fall back cleanly
+ *    per-glyph when the system font lacks them.
+ */
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  /* Type */
+  --font-sans: ui-sans-serif, system-ui, "Noto Sans", "Segoe UI", Roboto, Arial, sans-serif;
+  --font-display: ui-serif, "Noto Serif", Georgia, "Times New Roman", serif;
+
+  /* Surfaces */
+  --color-cream: #faf6ee; /* page background */
+  --color-parchment: #f2ebda; /* card / surface background */
+  --color-sand: #e0d4b9; /* hairline borders */
+  --color-earth: #3d362b; /* primary ink */
+  --color-clay: #5f5849; /* secondary ink */
+
+  /* Pillar accents */
+  --color-saffron: #c07a1e; /* body, decorative */
+  --color-saffron-deep: #8a4a0b; /* body, text-safe */
+  --color-sage: #74915c; /* nourishment / sitewide, decorative */
+  --color-sage-deep: #4a6133; /* text-safe */
+  --color-indigo: #7b76cf; /* mind, decorative */
+  --color-indigo-deep: #47429c; /* mind, text-safe */
+  --color-plum: #ad6a92; /* soul, decorative */
+  --color-plum-deep: #7c3a63; /* soul, text-safe */
+}
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-saffron-deep);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* Keyboard skip link, visually hidden until focused. */
+  .skip-link {
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    left: 0.75rem;
+    top: 0.75rem;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 1rem;
+    background: var(--color-earth);
+    color: var(--color-cream);
+    border-radius: 0.5rem;
+  }
+}

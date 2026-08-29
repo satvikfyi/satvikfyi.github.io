@@ -1,0 +1,147 @@
+---
+/**
+ * Ashtanga & Dhyan overview, Patañjali's eight limbs mapped onto this
+ * site's own practices, with the defining sūtras from the shared
+ * soul-teachings collection. Routed via src/pages/soul/meditation/index.astro.
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import TeachingArticle from '../../paths/components/TeachingArticle.astro';
+import SiblingPaths from '../../paths/components/SiblingPaths.astro';
+import config from '../module.config';
+
+const teachings = (await getCollection('soul-teachings'))
+  .filter((entry) => entry.data.path === 'meditation')
+  .sort((a, b) => a.data.reference.localeCompare(b.data.reference, 'en'));
+
+interface Limb {
+  number: string;
+  name: string;
+  meaning: string;
+  siteNote?: { text: string; href: string; label: string };
+}
+const limbs: Limb[] = [
+  { number: '1', name: 'Yama', meaning: 'Restraints, non-harm, truth, non-stealing, moderation, non-grasping' },
+  { number: '2', name: 'Niyama', meaning: 'Observances, purity, contentment, discipline, study, devotion to the highest' },
+  {
+    number: '3',
+    name: 'Āsana',
+    meaning: 'Posture, steady and comfortable',
+    siteNote: { text: 'This site:', href: '/body/yoga/', label: 'the asana database' },
+  },
+  {
+    number: '4',
+    name: 'Prāṇāyāma',
+    meaning: 'Breath-regulation, the life-force guided and stilled',
+    siteNote: { text: 'This site:', href: '/mind/pranayama/', label: 'the pranayama collection' },
+  },
+  { number: '5', name: 'Pratyāhāra', meaning: 'Withdrawal, the senses gathered home' },
+  {
+    number: '6',
+    name: 'Dhāraṇā',
+    meaning: 'Concentration, attention held on one point',
+    siteNote: { text: 'This site:', href: '/mind/meditation/anapana/', label: 'begin with the breath' },
+  },
+  { number: '7', name: 'Dhyāna', meaning: 'Meditation, attention flowing unbroken' },
+  { number: '8', name: 'Samādhi', meaning: 'Absorption, only the object shining' },
+];
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Ashtanga & Dhyan, the eight limbs"
+  eyebrow="Soul · Meditation"
+  lede="Patañjali's Yoga Sūtras map the whole terrain, ethics to absorption, in eight limbs. This page names the map and shows where every practice on this site sits upon it; the eight support one another like storeys of one building."
+  path={config.routePrefix}
+  accent="plum"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Soul', path: '/soul/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="space-y-10 lg:col-span-2">
+      <section aria-labelledby="limbs-heading" class="space-y-4">
+        <h2 id="limbs-heading" class="font-display text-2xl font-bold text-earth">The eight limbs</h2>
+        <ol role="list" class="space-y-3">
+          {
+            limbs.map((limb) => (
+              <li class="flex gap-4 rounded-2xl border border-sand bg-parchment/60 p-5">
+                <span
+                  aria-hidden="true"
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-plum/15 font-display text-sm font-bold text-plum-deep"
+                >
+                  {limb.number}
+                </span>
+                <div>
+                  <p class="font-display text-base font-semibold text-earth">
+                    {limb.name}
+                    <span class="ml-2 text-sm font-normal text-clay">{limb.meaning}</span>
+                  </p>
+                  {limb.siteNote && (
+                    <p class="mt-1 text-sm text-clay">
+                      {limb.siteNote.text}{' '}
+                      <a href={limb.siteNote.href} class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep">
+                        {limb.siteNote.label} →
+                      </a>
+                    </p>
+                  )}
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section aria-labelledby="essence-heading" class="space-y-4">
+        <h2 id="essence-heading" class="font-display text-2xl font-bold text-earth">The essence</h2>
+        <p class="leading-relaxed text-clay">
+          Read the list bottom-up and it is a ladder; read it top-down and it is a life. The
+          tradition's own caution is order: attempt absorption without the ethics (yama, niyama) and
+          the practice amplifies whatever is practising it. Attempt āsana as gymnastics and it stays
+          gymnastics, useful, but not yet the sūtra's project.
+        </p>
+        <p class="leading-relaxed text-clay">
+          The last three limbs, dhāraṇā, dhyāna, samādhi; are really one attention deepening
+          through three phases; Patañjali calls them together <em>saṁyama</em>. No one "does"
+          samādhi; one does the first five, and the last three arrive as the fruit.
+        </p>
+      </section>
+
+      <section aria-labelledby="teachings-heading" class="space-y-5">
+        <h2 id="teachings-heading" class="font-display text-2xl font-bold text-earth">From the tradition</h2>
+        {teachings.map((entry) => <TeachingArticle entry={entry} />)}
+      </section>
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <SiblingPaths current="meditation" />
+      {isModuleEnabled('meditation') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Learn to sit</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            The mind pillar carries the daily practices of limbs six and seven, breath, gaze,
+            kindness, witness.
+          </p>
+          <a
+            href="/mind/meditation/"
+            class="mt-4 inline-block text-sm font-semibold text-indigo-deep underline decoration-indigo/60 underline-offset-4 hover:decoration-indigo-deep"
+          >
+            The meditation collection →
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</PageLayout>

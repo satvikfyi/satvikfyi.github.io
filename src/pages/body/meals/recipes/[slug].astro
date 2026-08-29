@@ -1,0 +1,14 @@
+---
+// Route entry for /body/meals/recipes/{slug}/, delegates to the meals
+// module. getStaticPaths lives in the module page (returning no paths at
+// all when the module is disabled); props flow through to it untouched.
+export { getStaticPaths } from '../../../../sections/body/meals/pages/RecipeDetail.astro';
+import RecipeDetail from '../../../../sections/body/meals/pages/RecipeDetail.astro';
+import { isModuleEnabled } from '../../../../config/sections';
+
+if (!isModuleEnabled('meals')) {
+  return Astro.redirect('/body/', 302);
+}
+---
+
+<RecipeDetail {...Astro.props} />

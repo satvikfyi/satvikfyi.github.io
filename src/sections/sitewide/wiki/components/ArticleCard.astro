@@ -1,0 +1,30 @@
+---
+/**
+ * ArticleCard, a wiki listing entry: title linked to the article, category
+ * tag, summary. Used by the alphabetical index and category pages.
+ */
+import Tag from '../../../../shared/components/Tag.astro';
+import type { WikiArticle } from '../schemas/article';
+import { articleHref, categoryLabel } from '../lib/domain';
+
+interface Props {
+  article: WikiArticle;
+}
+
+const { article } = Astro.props;
+---
+
+<li
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-sage/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <div class="mb-2"><Tag label={categoryLabel[article.category]} accent="sage" /></div>
+  <h3 class="font-display text-xl leading-snug font-semibold text-earth">
+    <a
+      href={articleHref(article.category, article.slug)}
+      class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2"
+    >
+      {article.title}
+    </a>
+  </h3>
+  <p class="mt-2 text-sm leading-relaxed text-clay">{article.summary}</p>
+</li>

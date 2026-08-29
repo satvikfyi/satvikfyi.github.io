@@ -1,0 +1,46 @@
+---
+/**
+ * BaseLayout, HTML shell for every page: meta head, skip link, site header
+ * and footer, and a <main> landmark. Zero client JavaScript.
+ */
+import '../styles/tokens.css';
+import Meta from '../seo/Meta.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { SITE } from '../../config/site';
+import { isModuleEnabled } from '../../config/sections';
+import type { JsonLdObject } from '../seo/jsonld';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Absolute path of the page, e.g. "/body/meals/". */
+  path: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+  jsonLd?: JsonLdObject[];
+  /** Absolute social-share image URL, passed through to Meta. */
+  image?: string;
+}
+
+const { title, description, path, type, noindex, jsonLd = [], image } = Astro.props;
+---
+
+<!doctype html>
+<html lang={SITE.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <Meta title={title} description={description} path={path} type={type} noindex={noindex} image={image} />
+    {isModuleEnabled('blog') && <link rel="alternate" type="application/rss+xml" title={`${SITE.name}, Blog`} href="/rss.xml" />}
+    {jsonLd.map((obj) => <script is:inline type="application/ld+json" set:html={JSON.stringify(obj)} />)}
+  </head>
+  <body class="flex min-h-screen flex-col bg-cream font-sans text-earth antialiased">
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <SiteHeader currentPath={path} />
+    <main id="main-content" class="flex-1">
+      <slot />
+    </main>
+    <SiteFooter />
+  </body>
+</html>

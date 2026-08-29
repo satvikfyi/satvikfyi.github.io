@@ -1,0 +1,119 @@
+---
+/**
+ * Tantra overview, introductory-only by design. The page opens with a
+ * content warning, frames the traditions through cited scholarship, and
+ * explicitly points to living lineages for actual practice. Routed via
+ * src/pages/soul/tantra/index.astro (thin wrapper).
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import TeachingArticle from '../../paths/components/TeachingArticle.astro';
+import SiblingPaths from '../../paths/components/SiblingPaths.astro';
+import ContentWarning from '../../paths/components/ContentWarning.astro';
+import config from '../module.config';
+
+const teachings = (await getCollection('soul-teachings'))
+  .filter((entry) => entry.data.path === 'tantra')
+  .sort((a, b) => a.data.slug.localeCompare(b.data.slug, 'en'));
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="Tantra, an honest introduction"
+  eyebrow="Soul · Tantra"
+  lede="Few words are more used and less understood. This page introduces the tantric traditions as they present themselves in their own texts and in careful scholarship, introductory only, and deliberately so."
+  path={config.routePrefix}
+  accent="plum"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Soul', path: '/soul/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="space-y-10 lg:col-span-2">
+      <ContentWarning
+        label="Content guidance"
+        title="What this page is, and is not"
+        points={[
+          'This is an educational introduction to a family of religious traditions, based on their texts and cited scholarship.',
+          'It contains no ritual instructions, no initiation claims, and nothing esoteric to "try at home".',
+          'Tantra in the marketplace of stereotypes means other things entirely; this page deliberately contradicts none of the world\'s many fantasies; it simply describes the traditions as scholarship finds them.',
+          'The traditions themselves insist their practices are transmitted person-to-person within lineages. We respect that, and so should any honest introduction.',
+        ]}
+      />
+
+      <section aria-labelledby="essence-heading" class="space-y-4">
+        <h2 id="essence-heading" class="font-display text-2xl font-bold text-earth">The essence</h2>
+        <p class="leading-relaxed text-clay">
+          "Tantra" names a vast family of Indian traditions, Śaiva, Śākta, Vaiṣṇava, Buddhist; that
+          flourished from roughly the middle of the first millennium CE. What they share, beneath their
+          immense variety, is a conviction the older renunciate traditions did not foreground: that
+          <strong class="font-semibold text-earth">the body, the senses and the everyday world are
+          instruments of liberation, not obstacles to it</strong>.
+        </p>
+        <p class="leading-relaxed text-clay">
+          Their signature is the <em>sādhanā</em>, a structured practice combining mantra, ritual,
+          visualization and, in some lineages, yogic technique; performed under a teacher's guidance.
+          Much of what the modern world calls yoga descends from them: haṭha yoga is a tantric child.
+        </p>
+        <p class="leading-relaxed text-clay">
+          What tantra is <em>not</em> is the internet's version. The scholars cited below (Feuerstein,
+          Bharati, and the indologist David Gordon White) all labour the same point: the identification
+          of tantra with exotic sexuality is largely a 19th-century Western projection that stuck. Sex
+          appears in <em>some</em> tantric rites of <em>some</em> lineages, subordinated, ritualized,
+          and secret, never as the thing itself.
+        </p>
+      </section>
+
+      <section aria-labelledby="begin-heading" class="space-y-4">
+        <h2 id="begin-heading" class="font-display text-2xl font-bold text-earth">Where tantra quietly touches this site</h2>
+        <ul role="list" class="grid grid-cols-1 gap-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2">
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>The haṭha yoga of the Body pillar is a direct descendant of tantric body-practice.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>The mantra tradition of the Mind pillar is largely the tantric mantra-śāstra in daily use.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>The kīrtana of the Bhakti path drank deeply from tantric liturgy.</span></li>
+          <li class="flex gap-2 text-sm leading-relaxed text-earth"><span aria-hidden="true" class="mt-0.5 text-plum-deep">◆</span><span>Deity worship as Indians know it, image, temple, festival; is substantially the tantric legacy.</span></li>
+        </ul>
+        <p class="text-xs leading-relaxed text-clay">
+          For the practices themselves, the tradition's own answer stands: find a living lineage and a
+          qualified teacher. A website, this one included; is a doorway, not a guru.
+        </p>
+      </section>
+
+      <section aria-labelledby="teachings-heading" class="space-y-5">
+        <h2 id="teachings-heading" class="font-display text-2xl font-bold text-earth">From the tradition</h2>
+        {teachings.map((entry) => <TeachingArticle entry={entry} />)}
+      </section>
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <SiblingPaths current="tantra" />
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Scholarship worth reading</h2>
+        <ul role="list" class="mt-3 space-y-2 text-sm leading-relaxed text-clay">
+          <li>
+            <span class="font-medium text-earth">Tantra: The Path of Ecstasy</span>, Georg Feuerstein;
+            the standard careful introduction.
+          </li>
+          <li>
+            <span class="font-medium text-earth">The Tantric Tradition</span>, Agehananda Bharati;
+            the classic demythologizing study.
+          </li>
+          <li>
+            <span class="font-medium text-earth">Tantric Studies</span> (in many volumes), the
+            academic field's ongoing work.
+          </li>
+        </ul>
+      </div>
+    </aside>
+  </div>
+</PageLayout>

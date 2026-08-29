@@ -1,0 +1,31 @@
+---
+/**
+ * ContentWarning, the advisory banner the tantra overview carries (and any
+ * future module that needs one): what the page contains, how it is framed,
+ * and what it deliberately is not.
+ */
+interface Props {
+  label: string;
+  title: string;
+  points: string[];
+}
+
+const { label, title, points } = Astro.props;
+---
+
+<aside
+  role="note"
+  aria-label={label}
+  class="rounded-2xl border-2 border-plum/50 bg-plum/10 p-5 sm:p-6"
+>
+  <p class="mb-2 text-sm font-bold tracking-wide text-plum-deep uppercase">{label}</p>
+  <p class="mb-3 font-display text-lg font-semibold text-earth">{title}</p>
+  <ul role="list" class="space-y-1.5 text-sm leading-relaxed text-earth">
+    {points.map((point) => (
+      <li class="flex gap-2">
+        <span aria-hidden="true" class="mt-0.5 font-bold text-plum-deep">!</span>
+        <span>{point}</span>
+      </li>
+    ))}
+  </ul>
+</aside>

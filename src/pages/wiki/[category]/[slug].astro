@@ -1,0 +1,12 @@
+---
+// Route entry for /wiki/{category}/{slug}/, delegates to the wiki module.
+export { getStaticPaths } from '../../../sections/sitewide/wiki/pages/WikiArticle.astro';
+import WikiArticle from '../../../sections/sitewide/wiki/pages/WikiArticle.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('wiki')) {
+  return Astro.redirect('/wiki/', 302);
+}
+---
+
+<WikiArticle {...Astro.props} />

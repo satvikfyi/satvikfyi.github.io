@@ -1,0 +1,12 @@
+---
+// Route entry for /soul/meditation/, delegates to the ashtanga & dhyan
+// module (registry id 'soul-meditation'; the mind pillar owns 'meditation').
+import Index from '../../../sections/soul/meditation/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('soul-meditation')) {
+  return Astro.redirect('/soul/', 302);
+}
+---
+
+<Index />

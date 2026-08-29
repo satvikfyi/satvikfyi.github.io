@@ -1,0 +1,39 @@
+---
+/**
+ * Card, a link card used on the home page, pillar landings and listings.
+ * The whole card is one link: a large, forgiving target.
+ */
+import { accentCard, accentText } from './accents';
+import type { AccentToken } from '../../config/module';
+
+interface Props {
+  href: string;
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  footerNote?: string;
+  accent?: AccentToken;
+}
+
+const { href, title, description, eyebrow, footerNote, accent = 'sage' } = Astro.props;
+---
+
+<a
+  href={href}
+  class:list={[
+    'group block h-full rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200',
+    'hover:-translate-y-0.5 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0',
+    accentCard[accent],
+  ]}
+>
+  {eyebrow && <p class:list={['mb-1 text-xs font-semibold tracking-wide uppercase', accentText[accent]]}>{eyebrow}</p>}
+  <h3 class="font-display text-xl font-semibold text-earth group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4">
+    {title}
+  </h3>
+  {description && <p class="mt-2 text-sm leading-relaxed text-clay">{description}</p>}
+  {
+    footerNote && (
+      <p class="mt-4 text-xs font-medium tracking-wide uppercase text-clay">{footerNote}</p>
+    )
+  }
+</a>

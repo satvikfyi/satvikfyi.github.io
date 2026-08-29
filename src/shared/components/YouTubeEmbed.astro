@@ -1,0 +1,27 @@
+---
+/**
+ * YouTubeEmbed, privacy-enhanced nocookie embed. The iframe is lazy-loaded
+ * so pages that merely mention a video pay nothing until it scrolls into
+ * view.
+ */
+interface Props {
+  /** YouTube video id (not the full URL). */
+  videoId: string;
+  /** Accessible title describing the video. */
+  title: string;
+}
+
+const { videoId, title } = Astro.props;
+---
+
+<div class="relative aspect-video w-full overflow-hidden rounded-xl border border-sand">
+  <iframe
+    src={`https://www.youtube-nocookie.com/embed/${videoId}`}
+    title={title}
+    loading="lazy"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+    referrerpolicy="strict-origin-when-cross-origin"
+    allowfullscreen
+    class="absolute inset-0 h-full w-full border-0"
+  ></iframe>
+</div>

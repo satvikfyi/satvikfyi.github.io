@@ -1,0 +1,198 @@
+---
+/**
+ * Planner page, server-renders a complete sample plan and shopping list
+ * (fully usable without JavaScript), then the Planner island takes over
+ * with dosha selection, generation, swaps, persistence and printing.
+ * Routed via src/pages/body/meals/planner.astro (thin wrapper).
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { DOSHAS, doshaLabel, mealTypeLabel } from '../lib/domain';
+import {
+  PLAN_MEALS,
+  generatePlan,
+  planRecipes,
+  seededRandom,
+  type PlannerRecipe,
+} from '../lib/plan';
+import { buildShoppingList } from '../lib/shoppingList';
+import config from '../module.config';
+import '../styles/print.css';
+
+const entries = await getCollection('meals-recipes');
+const recipes: PlannerRecipe[] = entries
+  .map((entry) => ({
+    slug: entry.data.slug,
+    title: entry.data.title,
+    mealType: entry.data.mealType,
+    servings: entry.data.servings,
+    doshaEffects: entry.data.doshaEffects,
+    ingredients: entry.data.ingredients.map(({ item, quantity }) => ({ item, quantity })),
+  }))
+  .sort((a, b) => a.title.localeCompare(b.title, 'en'));
+
+// Deterministic sample so builds are stable; the island personalises it.
+const samplePlan = generatePlan(recipes, 'vata', seededRandom(20260822));
+const shopping = buildShoppingList(planRecipes(samplePlan, recipes));
+const bySlug = new Map(recipes.map((r) => [r.slug, r]));
+const payload = JSON.stringify({ recipes, plan: samplePlan }).replace(/</g, '\\u003c');
+
+const doshaHints: Record<string, string> = {
+  vata: 'airy, dry; favour warm, moist, grounding dishes',
+  pitta: 'fiery, favour cooling, mild, gently sweet dishes',
+  kapha: 'earthy, favour light, warm, well-spiced dishes',
+};
+---
+
+<PageLayout
+  title="Weekly Meal Planner"
+  description="Build a seven-day satvik meal plan that favours recipes balancing your dosha, with swaps, a shopping list that adds itself up, and storage on your device only."
+  heading="Weekly Meal Planner"
+  eyebrow="Body · Meals"
+  lede="Pick your dosha and get a seven-day breakfast–lunch–dinner plan drawn from the satvik recipe collection, favouring dishes that traditionally balance your constitution. Swap any slot, print the shopping list; everything stays on this device."
+  path="/body/meals/planner/"
+  accent="sage"
+  jsonLd={[
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Body', path: '/body/' },
+      { name: config.title, path: config.routePrefix },
+      { name: 'Weekly Meal Planner', path: '/body/meals/planner/' },
+    ]),
+  ]}
+>
+  <div id="planner">
+    <script is:inline type="application/json" id="planner-data" set:html={payload} />
+
+    <div class="no-print mt-8 rounded-2xl border border-sand bg-parchment/60 p-6">
+      <div id="planner-controls" hidden>
+        <fieldset>
+          <legend class="text-sm font-semibold text-earth">1 · Choose your dosha</legend>
+          <ul role="list" class="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {
+              DOSHAS.map((dosha, index) => (
+                <li>
+                  <label class="flex h-full cursor-pointer items-start gap-3 rounded-xl border border-sand bg-cream p-4 transition-colors has-checked:border-sage/60 has-checked:bg-sage/10">
+                    <input
+                      type="radio"
+                      name="planner-dosha"
+                      value={dosha}
+                      checked={index === 0}
+                      class="mt-1 h-4 w-4 shrink-0 accent-sage-deep"
+                    />
+                    <span>
+                      <span class="block text-sm font-semibold text-earth capitalize">{doshaLabel[dosha]}</span>
+                      <span class="mt-0.5 block text-xs leading-relaxed text-clay">{doshaHints[dosha]}</span>
+                    </span>
+                  </label>
+                </li>
+              ))
+            }
+          </ul>
+        </fieldset>
+        <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-sand pt-5">
+          <button
+            type="button"
+            id="regenerate"
+            class="rounded-xl bg-sage-deep px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+          >
+            2 · Regenerate the week
+          </button>
+          <button
+            type="button"
+            id="print-list"
+            class="rounded-xl border border-sand bg-cream px-5 py-2.5 text-sm font-semibold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep"
+          >
+            3 · Print shopping list
+          </button>
+          <p class="text-xs leading-relaxed text-clay">
+            Swap any slot with its ⇄ button. Your plan autosaves on this device, never on a server.
+          </p>
+        </div>
+      </div>
+      <noscript>
+        <p class="text-sm leading-relaxed text-clay">
+          JavaScript is off, so below is a <strong class="font-semibold text-earth">sample week favouring
+          vāta-balancing dishes</strong>, with its shopping list; print it straight from your browser. To
+          personalise by dosha and swap slots, enable JavaScript.
+        </p>
+      </noscript>
+    </div>
+
+    <p id="planner-status" role="status" aria-live="polite" class="no-print mt-6 min-h-5 text-sm font-medium text-sage-deep"></p>
+
+    <section aria-labelledby="plan-heading" class="mt-4 print-hide-on-list">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="plan-heading" class="font-display text-2xl font-bold text-earth">Your week</h2>
+        <p id="plan-dosha-note" class="text-xs text-clay">
+          Favouring <span class="font-semibold text-earth capitalize">{doshaLabel[samplePlan.dosha]}-balancing</span> dishes
+        </p>
+      </div>
+      <div class="mt-4 overflow-x-auto rounded-2xl border border-sand bg-parchment/60">
+        <table id="plan-table" class="w-full min-w-3xl border-collapse">
+          <caption class="sr-only">Seven-day satvik meal plan: breakfast, lunch and dinner for each day</caption>
+          <thead>
+            <tr class="border-b border-sand text-left">
+              <th scope="col" class="px-5 py-3 text-xs font-semibold tracking-wide text-clay uppercase">Day</th>
+              {PLAN_MEALS.map((meal) => (
+                <th scope="col" class="px-5 py-3 text-xs font-semibold tracking-wide text-clay uppercase">{mealTypeLabel[meal]}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody id="plan-body">
+            {
+              samplePlan.days.map((day) => (
+                <tr class="border-t border-sand align-top">
+                  <th scope="row" class="px-5 py-3 text-left text-sm font-semibold text-earth">Day {day.day}</th>
+                  {PLAN_MEALS.map((meal) => (
+                    <td class="px-5 py-3">
+                      <a
+                        href={`/body/meals/recipes/${day.meals[meal]}/`}
+                        class="text-sm font-medium text-earth underline decoration-sage/50 underline-offset-2 hover:decoration-sage-deep"
+                      >
+                        {bySlug.get(day.meals[meal])?.title ?? day.meals[meal]}
+                      </a>
+                    </td>
+                  ))}
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section aria-labelledby="shopping-heading" class="mt-12">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h2 id="shopping-heading" class="font-display text-2xl font-bold text-earth">Shopping list</h2>
+        <p class="text-xs text-clay">Aggregated across the week, grouped by ingredient; tick items as you shop</p>
+      </div>
+      <ul id="shopping-list" role="list" class="mt-4 grid grid-cols-1 gap-x-10 gap-y-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2 print:grid-cols-1">
+        {
+          shopping.map((entry, index) => (
+            <li class="break-inside-avoid">
+              <label class="flex items-baseline gap-3 text-sm leading-relaxed text-earth">
+                <input type="checkbox" id={`shopping-item-${index}`} class="mt-0.5 h-4 w-4 shrink-0 accent-sage-deep" />
+                <span>
+                  <strong class="font-semibold">{entry.item}</strong>, {entry.quantities.join(' + ')}
+                </span>
+              </label>
+            </li>
+          ))
+        }
+      </ul>
+    </section>
+
+    <div class="mt-10">
+      <Disclaimer variant="ayurveda" />
+    </div>
+  </div>
+</PageLayout>
+
+<script>
+  import { mountPlanner } from '../components/Planner';
+  mountPlanner(document.getElementById('planner'));
+</script>

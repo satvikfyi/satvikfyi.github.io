@@ -1,0 +1,54 @@
+---
+/**
+ * Disclaimer, the full, sitewide safety text. Compact variants of the same
+ * wording ship with the Disclaimer component on module pages.
+ */
+import ArticleLayout from '../shared/layouts/ArticleLayout.astro';
+import Disclaimer from '../shared/components/Disclaimer.astro';
+import { websiteJsonLd } from '../shared/seo/jsonld';
+import { SITE } from '../config/site';
+---
+
+<ArticleLayout
+  title="Disclaimer"
+  description="Satvik.fyi shares traditional wellness knowledge for education, it is not medical, psychological or spiritual advice. Read the full disclaimer."
+  path="/disclaimer/"
+  eyebrow="Legal"
+  jsonLd={[websiteJsonLd(SITE)]}
+>
+  <p>
+    Satvik.fyi exists to share the wisdom of the Indian traditions, ayurveda, yoga, pranayama,
+    mantra and philosophy, in a careful, well-sourced way. Everything here is
+    <strong>educational information about traditional systems</strong>, presented with their
+    sources. It is not, and must not be used as, a substitute for professional advice.
+  </p>
+
+  <div class="not-prose my-8 space-y-4">
+    <Disclaimer variant="general" />
+    <Disclaimer variant="ayurveda" />
+    <Disclaimer variant="yoga" />
+    <Disclaimer variant="pranayama" />
+  </div>
+
+  <h2>Advanced practices</h2>
+  <p>
+    Some practices the traditions themselves gatekeep, advanced pranayama (kumbhaka and related
+    breath retention), certain tantric material, and extended meditation retreats. Where this site
+    describes them, it does so descriptively with content warnings, and points to learning them
+    under qualified teachers rather than attempting them from a web page.
+  </p>
+
+  <h2>Sources and interpretation</h2>
+  <p>
+    Citations mark what a tradition actually says, in contrast with modern interpretation. Errors of
+    translation or attribution can still occur; if you spot one, please
+    <a href="/contact/">write in</a> and it will be corrected on the page.
+  </p>
+
+  <h2>No relationship</h2>
+  <p>
+    Use of this site does not create any practitioner–client, doctor–patient or teacher–student
+    relationship with anyone involved in building it. If any content here conflicts with guidance
+    from your own qualified practitioner or physician, follow your practitioner.
+  </p>
+</ArticleLayout>

@@ -1,0 +1,38 @@
+---
+/**
+ * 404, friendly, zero-JS not-found page.
+ */
+import BaseLayout from '../shared/layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="Page not found"
+  description="That page does not exist on Satvik.fyi."
+  path="/404/"
+  noindex
+>
+  <section class="mx-auto max-w-3xl px-4 py-20 text-center sm:px-6 sm:py-28">
+    <p class="text-sm font-semibold tracking-wide text-saffron-deep uppercase">404</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-earth sm:text-4xl">
+      This path leads nowhere, yet
+    </h1>
+    <p class="mx-auto mt-4 max-w-xl text-base leading-relaxed text-clay">
+      The page you were looking for doesn’t exist. Some modules of the site are still on the
+      roadmap, so a link may have drifted ahead of its content.
+    </p>
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <a
+        href="/"
+        class="rounded-xl bg-saffron-deep px-6 py-3 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+      >
+        Back to the home page
+      </a>
+      <a
+        href="/body/"
+        class="rounded-xl border border-sand bg-cream px-6 py-3 text-sm font-semibold text-earth transition-colors hover:border-saffron/60 hover:bg-parchment"
+      >
+        Explore the pillars
+      </a>
+    </div>
+  </section>
+</BaseLayout>

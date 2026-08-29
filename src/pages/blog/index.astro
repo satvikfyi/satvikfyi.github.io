@@ -1,0 +1,11 @@
+---
+// Route entry for /blog/, delegates to the blog module.
+import Index from '../../sections/sitewide/blog/pages/Index.astro';
+import { isModuleEnabled } from '../../config/sections';
+
+if (!isModuleEnabled('blog')) {
+  return Astro.redirect('/', 302);
+}
+---
+
+<Index />

@@ -1,0 +1,42 @@
+---
+/**
+ * EntryCard, a listing entry. Carries the data-* attributes the filter
+ * island filters on, so the markup the server renders is exactly the markup
+ * the island toggles (no-JS shows everything).
+ */
+import Tag from '../../../../shared/components/Tag.astro';
+import type { AyurvedaEntry } from '../schemas/entry';
+import DoshaEffectChips from './DoshaEffectChips.astro';
+import { entryKindLabel } from '../lib/domain';
+
+interface Props {
+  entry: AyurvedaEntry;
+}
+
+const { entry } = Astro.props;
+const detailHref = `/body/ayurveda/${entry.slug}/`;
+---
+
+<li
+  data-entry-card
+  data-kind={entry.kind}
+  data-vata={entry.doshaEffects.vata}
+  data-pitta={entry.doshaEffects.pitta}
+  data-kapha={entry.doshaEffects.kapha}
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-saffron/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <div class="mb-2 flex flex-wrap items-center gap-2">
+    <Tag label={entryKindLabel[entry.kind]} accent="saffron" />
+  </div>
+  <h3 class="font-display text-xl leading-snug font-semibold text-earth">
+    <a href={detailHref} class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2">
+      {entry.name}
+    </a>
+  </h3>
+  {entry.sanskritName && <p class="mt-0.5 text-sm font-medium text-clay italic">{entry.sanskritName}</p>}
+  <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-clay">{entry.summary}</p>
+  <div class="mt-4">
+    <DoshaEffectChips effects={entry.doshaEffects} short />
+  </div>
+  <p class="mt-auto pt-4 text-xs font-medium tracking-wide text-clay uppercase">{entry.partUsed}</p>
+</li>

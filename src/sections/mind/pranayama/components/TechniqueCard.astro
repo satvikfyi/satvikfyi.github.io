@@ -1,0 +1,52 @@
+---
+/**
+ * TechniqueCard, a listing entry. Carries the data-* attributes the filter
+ * island filters on, so the markup the server renders is exactly the markup
+ * the island toggles (no-JS shows everything).
+ */
+import Tag from '../../../../shared/components/Tag.astro';
+import type { Technique } from '../schemas/technique';
+import { categoryLabel, doshaLabel, levelLabel } from '../lib/domain';
+
+interface Props {
+  technique: Technique;
+}
+
+const { technique } = Astro.props;
+const detailHref = `/mind/pranayama/${technique.slug}/`;
+---
+
+<li
+  data-technique-card
+  data-category={technique.category}
+  data-level={technique.level}
+  data-doshas={technique.associatedDoshas.join(',')}
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-indigo/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <div class="mb-2 flex flex-wrap items-center gap-2">
+    <Tag label={categoryLabel[technique.category]} accent="indigo" />
+    <Tag label={levelLabel[technique.level]} />
+    {technique.requiresTeacher && <Tag label="Learn with a teacher" accent="plum" />}
+  </div>
+  <h3 class="font-display text-xl leading-snug font-semibold text-earth">
+    <a href={detailHref} class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2">
+      {technique.name}
+    </a>
+  </h3>
+  <p class="mt-0.5 text-sm font-medium text-clay italic">{technique.sanskritName}</p>
+  <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-clay">{technique.summary}</p>
+  <ul role="list" class="mt-4 flex flex-wrap gap-1.5" aria-label="Balances">
+    {
+      technique.associatedDoshas.map((dosha) => (
+        <li>
+          <span class="inline-flex items-center rounded-full bg-sage/15 px-2 py-0.5 text-xs font-medium text-sage-deep">
+            Balances {doshaLabel[dosha]}
+          </span>
+        </li>
+      ))
+    }
+  </ul>
+  <p class="mt-auto pt-4 text-xs font-medium tracking-wide text-clay uppercase">
+    {technique.durationGuidance.split(';')[0]}
+  </p>
+</li>

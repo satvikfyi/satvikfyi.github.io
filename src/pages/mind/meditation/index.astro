@@ -1,0 +1,11 @@
+---
+// Route entry for /mind/meditation/, delegates to the meditation module.
+import Index from '../../../sections/mind/meditation/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('meditation')) {
+  return Astro.redirect('/mind/', 302);
+}
+---
+
+<Index />

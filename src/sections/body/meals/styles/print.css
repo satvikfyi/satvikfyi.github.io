@@ -1,0 +1,35 @@
+/*
+ * Meals module print styles, applied to recipe detail and planner pages.
+ *
+ * Generic rules keep any page clean on paper (no header/footer/buttons).
+ * The planner island additionally toggles `body.printing-list` before
+ * calling window.print() so "Print shopping list" prints just the list.
+ */
+@media print {
+  body > header,
+  body > footer,
+  .skip-link,
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  tr,
+  li,
+  .break-inside-avoid {
+    break-inside: avoid;
+  }
+
+  /* "Print shopping list" mode: the plan table yields to the list. */
+  body.printing-list .print-hide-on-list {
+    display: none !important;
+  }
+}

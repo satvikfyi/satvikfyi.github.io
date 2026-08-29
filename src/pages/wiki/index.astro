@@ -1,0 +1,11 @@
+---
+// Route entry for /wiki/, delegates to the wiki module.
+import Index from '../../sections/sitewide/wiki/pages/Index.astro';
+import { isModuleEnabled } from '../../config/sections';
+
+if (!isModuleEnabled('wiki')) {
+  return Astro.redirect('/', 302);
+}
+---
+
+<Index />

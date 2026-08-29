@@ -1,0 +1,14 @@
+---
+// Route entry for /mind/pranayama/{slug}/, delegates to the pranayama
+// module. getStaticPaths lives in the module page (returning no paths at
+// all when the module is disabled); props flow through untouched.
+export { getStaticPaths } from '../../../sections/mind/pranayama/pages/TechniqueDetail.astro';
+import TechniqueDetail from '../../../sections/mind/pranayama/pages/TechniqueDetail.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('pranayama')) {
+  return Astro.redirect('/mind/', 302);
+}
+---
+
+<TechniqueDetail {...Astro.props} />

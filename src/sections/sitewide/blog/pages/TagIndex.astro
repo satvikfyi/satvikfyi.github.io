@@ -1,0 +1,59 @@
+---
+/**
+ * Tag page, every published post carrying the tag, newest first.
+ * Routed via src/pages/blog/tag/[tag].astro (thin wrapper).
+ */
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import PostCard from '../components/PostCard.astro';
+import { blogEnabled, publishedPosts } from '../lib/posts';
+
+export async function getStaticPaths() {
+  if (!blogEnabled()) return [];
+  const posts = await publishedPosts();
+  const tags = [...new Set(posts.flatMap((post) => post.data.tags))].sort();
+  return tags.map((tag) => ({
+    params: { tag },
+    props: {
+      posts: posts.filter((post) => post.data.tags.includes(tag)).map((post) => post.data),
+    },
+  }));
+}
+
+interface Props {
+  posts: import('../schemas/post').Post[];
+}
+
+const { posts } = Astro.props;
+const tag = Astro.params.tag ?? '';
+const path = `/blog/tag/${tag}/`;
+---
+
+<PageLayout
+  title={`Posts tagged “${tag}”`}
+  description={`All Satvik.fyi blog posts tagged ${tag}.`}
+  heading={`#${tag}`}
+  eyebrow="Blog · Tag"
+  lede={`${posts.length} ${posts.length === 1 ? 'post' : 'posts'} tagged #${tag}.`}
+  path={path}
+  accent="sage"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Blog', path: '/blog/' },
+      { name: `#${tag}`, path },
+    ]),
+  ]}
+>
+  <ul role="list" class="mt-8 grid grid-cols-1 gap-6">
+    {posts.map((post) => <PostCard post={post} />)}
+  </ul>
+
+  <p class="mt-10">
+    <a href="/blog/" class="text-sm font-semibold text-sage-deep underline decoration-sage/60 underline-offset-4 hover:decoration-sage-deep">
+      ← All posts
+    </a>
+  </p>
+</PageLayout>

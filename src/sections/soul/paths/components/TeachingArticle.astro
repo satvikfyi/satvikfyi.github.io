@@ -1,0 +1,44 @@
+---
+/**
+ * TeachingArticle, one scriptural teaching rendered as a full article:
+ * the verse (IAST) set apart, the translation beneath, then the reflective
+ * essay (the entry's markdown body). Used by every soul path overview page.
+ */
+import { render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import type { Teaching } from '../schemas/teaching';
+
+interface Props {
+  entry: CollectionEntry<'soul-teachings'>;
+}
+
+const { entry } = Astro.props;
+const teaching: Teaching = entry.data;
+const { Content } = await render(entry);
+---
+
+<article class="rounded-2xl border border-sand bg-parchment/60 p-6 sm:p-8" aria-labelledby={`teaching-${teaching.slug}`}>
+  <h3 id={`teaching-${teaching.slug}`} class="font-display text-xl font-semibold text-earth">
+    {teaching.title}
+  </h3>
+  <p class="mt-1 text-xs font-semibold tracking-wide text-plum-deep uppercase">
+    {teaching.scripture} · {teaching.reference}
+  </p>
+  <p class="mt-2 text-sm leading-relaxed text-clay">{teaching.summary}</p>
+
+  {
+    teaching.sanskrit && (
+      <div class="mt-5 rounded-xl border border-plum/25 bg-plum/5 p-5 text-center">
+        <p lang="sa" class="font-display text-base leading-loose text-earth italic sm:text-lg">
+          {teaching.sanskrit}
+        </p>
+      </div>
+    )
+  }
+
+  <p class="mt-4 text-sm leading-relaxed text-earth">{teaching.translation}</p>
+
+  <div class="prose prose-earth mt-4 max-w-none text-sm prose-headings:font-display prose-a:text-saffron-deep">
+    <Content />
+  </div>
+</article>

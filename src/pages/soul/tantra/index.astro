@@ -1,0 +1,12 @@
+---
+// Route entry for /soul/tantra/, delegates to the tantra module
+// (introductory-only treatment with content warning).
+import Index from '../../../sections/soul/tantra/pages/Index.astro';
+import { isModuleEnabled } from '../../../config/sections';
+
+if (!isModuleEnabled('tantra')) {
+  return Astro.redirect('/soul/', 302);
+}
+---
+
+<Index />

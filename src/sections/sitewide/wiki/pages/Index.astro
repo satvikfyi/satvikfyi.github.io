@@ -1,0 +1,128 @@
+---
+/**
+ * Wiki index, the alphabetical index (grouped by first letter across all
+ * articles) plus the five category sections. Zero client JavaScript.
+ * Routed via src/pages/wiki/index.astro.
+ */
+import { getCollection } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import config from '../module.config';
+import { WIKI_CATEGORIES, categoryHref, categoryIntro, categoryLabel } from '../lib/domain';
+
+const entries = await getCollection('wiki-articles');
+const articles = entries.map((entry) => entry.data);
+
+// Alphabetical index: group by first letter (Latin alphabet), A→Z.
+const byLetter = new Map<string, typeof articles>();
+for (const article of articles) {
+  const letter = (article.title[0] ?? '#').toUpperCase();
+  byLetter.set(letter, [...(byLetter.get(letter) ?? []), article]);
+}
+const letters = [...byLetter.keys()].sort((a, b) => a.localeCompare(b, 'en'));
+
+const groups = WIKI_CATEGORIES.map((category) => ({
+  category,
+  items: articles
+    .filter((a) => a.category === category)
+    .sort((a, b) => a.title.localeCompare(b.title, 'en')),
+})).filter((group) => group.items.length > 0);
+---
+
+<PageLayout
+  title={config.title}
+  description={config.description}
+  heading="The Knowledge Base"
+  eyebrow="Sitewide · Wiki"
+  lede="Scriptures, books, deities, worship and the concepts the traditions think in: cross-referenced, cited, and honest about what is scripture and what is scholarship. Browse alphabetically or by category."
+  path={config.routePrefix}
+  accent="sage"
+  jsonLd={[
+    websiteJsonLd(SITE),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: config.title, path: config.routePrefix },
+    ]),
+  ]}
+>
+  <div class="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="space-y-10 lg:col-span-2">
+      <section aria-labelledby="alpha-heading">
+        <h2 id="alpha-heading" class="font-display text-2xl font-bold text-earth">Alphabetical index</h2>
+        <nav aria-label="Jump to letter" class="mt-3 flex flex-wrap gap-1.5">
+          {
+            letters.map((letter) => (
+              <a
+                href={`#letter-${letter}`}
+                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-sand bg-cream font-display text-sm font-bold text-earth transition-colors hover:border-sage/60 hover:text-sage-deep"
+              >
+                {letter}
+              </a>
+            ))
+          }
+        </nav>
+        <div class="mt-6 space-y-6">
+          {
+            letters.map((letter) => (
+              <section aria-labelledby={`letter-${letter}`}>
+                <h3 id={`letter-${letter}`} class="font-display text-lg font-bold text-sage-deep">{letter}</h3>
+                <ul role="list" class="mt-2 divide-y divide-sand rounded-2xl border border-sand bg-parchment/60">
+                  {byLetter
+                    .get(letter)!
+                    .sort((a, b) => a.title.localeCompare(b.title, 'en'))
+                    .map((article) => (
+                      <li>
+                        <a
+                          href={`/wiki/${article.category}/${article.slug}/`}
+                          class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 px-5 py-3 transition-colors hover:bg-sage/10"
+                        >
+                          <span class="font-display text-base font-semibold text-earth">{article.title}</span>
+                          <span class="text-xs font-medium tracking-wide text-clay uppercase">
+                            {categoryLabel[article.category]}
+                          </span>
+                        </a>
+                      </li>
+                    ))}
+                </ul>
+              </section>
+            ))
+          }
+        </div>
+      </section>
+
+      <Disclaimer variant="general" />
+    </div>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">By category</h2>
+        <ul role="list" class="mt-3 space-y-3 text-sm">
+          {
+            groups.map(({ category, items }) => (
+              <li>
+                <a
+                  href={categoryHref(category)}
+                  class="font-semibold text-sage-deep underline decoration-sage/60 underline-offset-2 hover:decoration-sage-deep"
+                >
+                  {categoryLabel[category]}
+                </a>
+                <span class="text-clay">, {categoryIntro[category]} ({items.length})</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">How this wiki works</h2>
+        <p class="mt-2 text-sm leading-relaxed text-clay">
+          Every article lists its <strong class="font-semibold text-earth">related</strong> entries,
+          and shows where other articles point back to it, the two directions of every
+          cross-reference. Scripture is cited as scripture; modern books as modern books.
+        </p>
+      </div>
+    </aside>
+  </div>
+</PageLayout>

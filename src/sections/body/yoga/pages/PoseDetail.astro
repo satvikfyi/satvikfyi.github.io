@@ -1,0 +1,271 @@
+---
+/**
+ * Pose detail, steps, benefits, contraindications, breathing pattern,
+ * dosha associations, optional lazy nocookie video, sources and the yoga
+ * disclaimer. Cross-module links are plain URLs only (meals ?dosha=, quiz).
+ * Routed via src/pages/body/yoga/[slug].astro (thin wrapper).
+ */
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import PageLayout from '../../../../shared/layouts/PageLayout.astro';
+import Disclaimer from '../../../../shared/components/Disclaimer.astro';
+import Tag from '../../../../shared/components/Tag.astro';
+import ExternalLink from '../../../../shared/components/ExternalLink.astro';
+import YouTubeEmbed from '../../../../shared/components/YouTubeEmbed.astro';
+import { breadcrumbJsonLd } from '../../../../shared/seo/jsonld';
+import { SITE } from '../../../../config/site';
+import { isModuleEnabled } from '../../../../config/sections';
+import { poseJsonLd } from '../lib/jsonld';
+import config from '../module.config';
+import { doshaLabel, poseCategoryLabel, poseLevelLabel, youtubeId } from '../lib/domain';
+
+export async function getStaticPaths() {
+  // Disabled module → no detail pages are built at all.
+  if (!isModuleEnabled('yoga')) return [];
+  const entries = await getCollection('yoga-poses');
+  return entries.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'yoga-poses'>;
+}
+
+const { entry } = Astro.props;
+const pose = entry.data;
+const { Content } = await render(entry);
+const hasBody = typeof entry.body === 'string' && entry.body.trim().length > 0;
+const path = `/body/yoga/${pose.slug}/`;
+
+const video = pose.videoUrl ? youtubeId(pose.videoUrl) : null;
+const related = (await getCollection('yoga-poses'))
+  .map((e) => e.data)
+  .filter((p) => p.slug !== pose.slug && p.category === pose.category)
+  .sort((a, b) => a.name.localeCompare(b.name, 'en'))
+  .slice(0, 3);
+---
+
+<PageLayout
+  title={`${pose.name} (${pose.sanskritName})`}
+  description={pose.summary}
+  heading={pose.name}
+  eyebrow={`Body · Yoga · ${poseCategoryLabel[pose.category]}`}
+  path={path}
+  type="article"
+  accent="saffron"
+  jsonLd={[
+    poseJsonLd({ pose, siteUrl: SITE.url, path, siteName: SITE.name }),
+    breadcrumbJsonLd(SITE.url, [
+      { name: 'Home', path: '/' },
+      { name: 'Body', path: '/body/' },
+      { name: config.title, path: config.routePrefix },
+      { name: pose.name, path },
+    ]),
+  ]}
+>
+  <nav aria-label="Breadcrumb" class="mb-6">
+    <ol class="flex flex-wrap items-center gap-2 text-sm text-clay">
+      <li><a href="/" class="hover:text-saffron-deep hover:underline">Home</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/body/" class="hover:text-saffron-deep hover:underline">Body</a></li>
+      <li aria-hidden="true">/</li>
+      <li><a href="/body/yoga/" class="hover:text-saffron-deep hover:underline">Yogasana</a></li>
+      <li aria-hidden="true">/</li>
+      <li aria-current="page" class="font-medium text-earth">{pose.name}</li>
+    </ol>
+  </nav>
+
+  <div class="grid grid-cols-1 gap-10 lg:grid-cols-3">
+    <article class="lg:col-span-2">
+      <p class="font-display text-xl text-clay italic">{pose.sanskritName}</p>
+      <p class="mt-4 text-lg leading-relaxed text-clay">{pose.summary}</p>
+      <div class="mt-4 flex flex-wrap items-center gap-2">
+        <Tag label={poseCategoryLabel[pose.category]} accent="saffron" />
+        <Tag label={poseLevelLabel[pose.level]} />
+        {pose.associatedDoshas.map((dosha) => (
+          <Tag label={`Balances ${doshaLabel[dosha]}`} accent="sage" />
+        ))}
+      </div>
+
+      <section aria-labelledby="steps-heading" class="mt-10">
+        <h2 id="steps-heading" class="font-display text-2xl font-bold text-earth">How to practice</h2>
+        <p class="mt-2 text-sm leading-relaxed text-clay">{pose.breathingPattern}</p>
+        <ol role="list" class="mt-4 space-y-4">
+          {
+            pose.steps.map((step, index) => (
+              <li class="flex gap-4">
+                <span
+                  aria-hidden="true"
+                  class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-saffron/15 text-sm font-bold text-saffron-deep"
+                >
+                  {index + 1}
+                </span>
+                <p class="text-sm leading-relaxed text-earth">{step}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </section>
+
+      <section aria-labelledby="benefits-heading" class="mt-10">
+        <h2 id="benefits-heading" class="font-display text-2xl font-bold text-earth">Benefits</h2>
+        <ul role="list" class="mt-4 grid grid-cols-1 gap-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2">
+          {
+            pose.benefits.map((benefit) => (
+              <li class="flex gap-2 text-sm leading-relaxed text-earth">
+                <span aria-hidden="true" class="mt-0.5 text-sage-deep">◆</span>
+                <span>{benefit}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section aria-labelledby="contra-heading" class="mt-10">
+        <h2 id="contra-heading" class="font-display text-2xl font-bold text-earth">Contraindications &amp; cautions</h2>
+        <ul role="list" class="mt-4 space-y-2 rounded-2xl border border-plum/30 bg-plum/5 p-6">
+          {
+            pose.contraindications.map((caution) => (
+              <li class="flex gap-2 text-sm leading-relaxed text-earth">
+                <span aria-hidden="true" class="mt-0.5 font-bold text-plum-deep">!</span>
+                <span>{caution}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-3 text-xs leading-relaxed text-clay">
+          Skip or modify the pose on days a caution applies to you, and work with a qualified teacher for
+          injuries, pregnancy or health conditions.
+        </p>
+      </section>
+
+      {
+        video && (
+          <section aria-labelledby="video-heading" class="mt-10">
+            <h2 id="video-heading" class="font-display text-2xl font-bold text-earth">Watch a free guide</h2>
+            <p class="mt-2 mb-4 text-sm leading-relaxed text-clay">
+              A free video walkthrough from a public teacher, loaded only when you scroll to it, via
+              YouTube's privacy-enhanced player.
+            </p>
+            <YouTubeEmbed videoId={video} title={`${pose.name} (${pose.sanskritName}), free video guide`} />
+          </section>
+        )
+      }
+
+      {
+        hasBody && (
+          <section aria-labelledby="tradition-heading" class="mt-10">
+            <h2 id="tradition-heading" class="font-display text-2xl font-bold text-earth">In the tradition</h2>
+            <div class="prose prose-earth mt-4 max-w-none prose-headings:font-display prose-a:text-saffron-deep">
+              <Content />
+            </div>
+          </section>
+        )
+      }
+
+      {
+        pose.sources.length > 0 && (
+          <section aria-labelledby="sources-heading" class="mt-10">
+            <h2 id="sources-heading" class="font-display text-2xl font-bold text-earth">Sources &amp; further reading</h2>
+            <ul role="list" class="mt-4 space-y-2 text-sm leading-relaxed text-clay">
+              {pose.sources.map((source) => (
+                <li class="flex gap-2">
+                  <span aria-hidden="true" class="mt-0.5 text-saffron-deep">◆</span>
+                  <span>
+                    {source.url ? (
+                      <ExternalLink href={source.url} class="font-medium text-saffron-deep underline decoration-saffron/60 underline-offset-2">
+                        {source.title}
+                      </ExternalLink>
+                    ) : (
+                      <span class="font-medium text-earth">{source.title}</span>
+                    )}
+                    {source.author && <span>, {source.author}</span>}
+                    {source.reference && <span class="italic"> ({source.reference})</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <p class="mt-3 text-xs leading-relaxed text-clay">
+              Classical citations mark where a tradition is drawn on; modern books and videos are shared as
+              further guidance, not as prescriptions.
+            </p>
+          </section>
+        )
+      }
+
+      <div class="mt-10">
+        <Disclaimer variant="yoga" />
+      </div>
+    </article>
+
+    <aside class="h-fit space-y-6 lg:sticky lg:top-6">
+      <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+        <h2 class="font-display text-base font-semibold text-earth">Dosha associations</h2>
+        <ul role="list" class="mt-3 flex flex-wrap gap-2">
+          {
+            pose.associatedDoshas.map((dosha) => (
+              <li>
+                <span class="inline-flex items-center rounded-full bg-sage/15 px-3 py-1 text-sm font-medium text-sage-deep">
+                  Balances {doshaLabel[dosha]}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mt-3 text-xs leading-relaxed text-clay">
+          Associations follow traditional hatha-yoga energetics and are educational, not medical guidance.
+        </p>
+        {isModuleEnabled('meals') && pose.associatedDoshas.length > 0 && (
+          <a
+            href={`/body/meals/?dosha=${pose.associatedDoshas[0]}`}
+            class="mt-4 inline-block rounded-xl bg-saffron-deep px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+          >
+            Recipes balancing {doshaLabel[pose.associatedDoshas[0]]}
+          </a>
+        )}
+      </div>
+
+      {isModuleEnabled('quiz') && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">Find your dosha</h2>
+          <p class="mt-2 text-sm leading-relaxed text-clay">
+            Unsure whether this pose suits your constitution? The quiz takes a few minutes; your result
+            personalises the filters here and the meal planner.
+          </p>
+          <a
+            href="/quiz/"
+            class="mt-4 inline-block rounded-xl border border-sand bg-cream px-5 py-2.5 text-sm font-semibold text-earth transition-colors hover:border-saffron/60 hover:text-saffron-deep"
+          >
+            Take the dosha quiz
+          </a>
+        </div>
+      )}
+
+      {related.length > 0 && (
+        <div class="rounded-2xl border border-sand bg-parchment/60 p-6">
+          <h2 class="font-display text-base font-semibold text-earth">More {poseCategoryLabel[pose.category].toLowerCase()} poses</h2>
+          <ul role="list" class="mt-3 space-y-2 text-sm">
+            {
+              related.map((other) => (
+                <li>
+                  <a
+                    href={`/body/yoga/${other.slug}/`}
+                    class="font-medium text-earth underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep"
+                  >
+                    {other.name}
+                  </a>
+                  <span class="text-clay"> · {other.sanskritName}</span>
+                </li>
+              ))
+            }
+          </ul>
+          <a href="/body/yoga/" class="mt-4 inline-block text-sm font-semibold text-saffron-deep underline decoration-saffron/60 underline-offset-4 hover:decoration-saffron-deep">
+            Browse all poses
+          </a>
+        </div>
+      )}
+    </aside>
+  </div>
+</PageLayout>

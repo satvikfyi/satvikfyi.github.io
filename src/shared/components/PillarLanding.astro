@@ -1,0 +1,62 @@
+---
+/**
+ * PillarLanding, the generic, registry-driven landing page every pillar
+ * renders. Lists its enabled child modules as cards; when a pillar has no
+ * enabled modules yet it degrades gracefully with a roadmap note.
+ */
+import PageLayout from '../layouts/PageLayout.astro';
+import Card from './Card.astro';
+import { enabledModules } from '../../config/sections';
+import type { PillarSectionConfig } from '../../config/module';
+import { websiteJsonLd } from '../seo/jsonld';
+import { SITE } from '../../config/site';
+
+interface Props {
+  pillar: PillarSectionConfig;
+}
+
+const { pillar } = Astro.props;
+const modules = enabledModules(pillar.id);
+const accent = pillar.accent ?? 'saffron';
+---
+
+<PageLayout
+  title={pillar.title}
+  description={pillar.description}
+  heading={pillar.title}
+  eyebrow="Pillar"
+  lede={pillar.description}
+  path={pillar.routePrefix}
+  accent={accent}
+  jsonLd={[websiteJsonLd(SITE)]}
+>
+  {
+    modules.length > 0 ? (
+      <ul role="list" class="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {modules.map((module) => (
+          <li>
+            <Card
+              href={module.routePrefix}
+              title={module.title}
+              description={module.description}
+              eyebrow={pillar.title}
+              accent={module.accent ?? accent}
+            />
+          </li>
+        ))}
+      </ul>
+    ) : (
+      <div class="mt-10 rounded-2xl border border-dashed border-sand bg-parchment/50 p-8">
+        <h2 class="font-display text-lg font-semibold text-earth">On the roadmap</h2>
+        <p class="mt-2 max-w-2xl text-sm leading-relaxed text-clay">
+          Modules for this pillar are planned and registered, but none are built yet. The site grows
+          one module at a time, each is announced when its sources, schemas and accessibility
+          checks are complete.
+        </p>
+        <a href="/" class="mt-4 inline-block text-sm font-semibold text-saffron-deep underline decoration-saffron/60 underline-offset-4 hover:decoration-saffron-deep">
+          Back to the pillars
+        </a>
+      </div>
+    )
+  }
+</PageLayout>

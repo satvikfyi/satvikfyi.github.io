@@ -1,0 +1,11 @@
+---
+// Route entry for /search/, delegates to the search module.
+import Index from '../../sections/sitewide/search/pages/Search.astro';
+import { isModuleEnabled } from '../../config/sections';
+
+if (!isModuleEnabled('search')) {
+  return Astro.redirect('/', 302);
+}
+---
+
+<Index />

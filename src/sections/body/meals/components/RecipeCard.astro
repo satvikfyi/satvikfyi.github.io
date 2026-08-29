@@ -1,0 +1,47 @@
+---
+/**
+ * RecipeCard, a listing entry. Carries the data-* attributes the filter
+ * island filters on, so the markup the server renders is exactly the
+ * markup the island toggles (no-JS shows everything).
+ */
+import Tag from '../../../../shared/components/Tag.astro';
+import type { Recipe } from '../schemas/recipe';
+import DoshaChips from './DoshaChips.astro';
+import { mealTypeLabel, seasonLabel } from '../lib/domain';
+
+interface Props {
+  recipe: Recipe;
+}
+
+const { recipe } = Astro.props;
+const totalTime = recipe.prepTime + recipe.cookTime;
+const detailHref = `/body/meals/recipes/${recipe.slug}/`;
+---
+
+<li
+  data-recipe-card
+  data-meal={recipe.mealType}
+  data-vata={recipe.doshaEffects.vata}
+  data-pitta={recipe.doshaEffects.pitta}
+  data-kapha={recipe.doshaEffects.kapha}
+  data-seasons={recipe.seasonalSuitability.join(',')}
+  data-tags={recipe.satvikTags.join(',')}
+  class="group relative flex h-full flex-col rounded-2xl border border-sand bg-parchment/60 p-6 transition duration-200 hover:-translate-y-0.5 hover:border-sage/60 hover:shadow-md motion-reduce:transition-none motion-reduce:hover:translate-y-0"
+>
+  <div class="mb-2 flex flex-wrap items-center gap-2">
+    <Tag label={mealTypeLabel[recipe.mealType]} accent="sage" />
+    {recipe.satvikTags.includes('tridoshic') && <Tag label="Tridoshic" accent="saffron" />}
+  </div>
+  <h3 class="font-display text-xl leading-snug font-semibold text-earth">
+    <a href={detailHref} class="after:absolute after:inset-0 after:content-[''] group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4 focus-visible:outline-2">
+      {recipe.title}
+    </a>
+  </h3>
+  <p class="mt-2 line-clamp-3 text-sm leading-relaxed text-clay">{recipe.summary}</p>
+  <div class="mt-4">
+    <DoshaChips effects={recipe.doshaEffects} short />
+  </div>
+  <p class="mt-auto pt-4 text-xs font-medium tracking-wide text-clay uppercase">
+    {totalTime} min · serves {recipe.servings} · {recipe.seasonalSuitability.map((s) => seasonLabel[s]).join(', ')}
+  </p>
+</li>
