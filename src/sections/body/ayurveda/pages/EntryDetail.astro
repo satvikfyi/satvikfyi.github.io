@@ -15,6 +15,7 @@ import { breadcrumbJsonLd, articleJsonLd } from '../../../../shared/seo/jsonld';
 import { SITE } from '../../../../config/site';
 import { isModuleEnabled } from '../../../../config/sections';
 import DoshaEffectChips from '../components/DoshaEffectChips.astro';
+import MovedEntry from '../components/MovedEntry.astro';
 import config from '../module.config';
 import { DOSHAS, doshaLabel, entryKindLabel, propertyLabel, tasteLabel } from '../lib/domain';
 
@@ -34,37 +35,48 @@ interface Props {
 
 const { entry } = Astro.props;
 const item = entry.data;
-const { Content } = await render(entry);
-const hasBody = typeof entry.body === 'string' && entry.body.trim().length > 0;
 const path = `/body/ayurveda/${item.slug}/`;
 
-const balancing = DOSHAS.filter((d) => item.doshaEffects[d] === 'balancing');
+// Entries migrated to the wiki render the soft-redirect stub instead of
+// content; render() still runs (typing stays simple) but its output is
+// only used for live entries.
+const moved = typeof item.movedTo === 'string' && item.movedTo.length > 0;
+const { Content } = await render(entry);
+const hasBody = !moved && typeof entry.body === 'string' && entry.body.trim().length > 0;
+
+const balancing = moved ? [] : DOSHAS.filter((d) => item.doshaEffects[d] === 'balancing');
 ---
 
-<PageLayout
-  title={item.sanskritName ? `${item.name} (${item.sanskritName})` : item.name}
-  description={item.summary}
-  heading={item.name}
-  eyebrow={`Body · Ayurveda · ${entryKindLabel[item.kind]}`}
-  path={path}
-  type="article"
-  accent="saffron"
-  jsonLd={[
-    articleJsonLd({
-      siteName: SITE.name,
-      siteUrl: SITE.url,
-      title: item.sanskritName ? `${item.name} (${item.sanskritName})` : item.name,
-      description: item.summary,
-      path,
-    }),
-    breadcrumbJsonLd(SITE.url, [
-      { name: 'Home', path: '/' },
-      { name: 'Body', path: '/body/' },
-      { name: config.title, path: config.routePrefix },
-      { name: item.name, path },
-    ]),
-  ]}
->
+{
+  moved && <MovedEntry name={item.name} summary={item.summary} path={path} movedTo={item.movedTo as string} />
+}
+
+{
+  !moved && (
+    <PageLayout
+      title={item.sanskritName ? `${item.name} (${item.sanskritName})` : item.name}
+      description={item.summary}
+      heading={item.name}
+      eyebrow={`Body · Ayurveda · ${entryKindLabel[item.kind]}`}
+      path={path}
+      type="article"
+      accent="saffron"
+      jsonLd={[
+        articleJsonLd({
+          siteName: SITE.name,
+          siteUrl: SITE.url,
+          title: item.sanskritName ? `${item.name} (${item.sanskritName})` : item.name,
+          description: item.summary,
+          path,
+        }),
+        breadcrumbJsonLd(SITE.url, [
+          { name: 'Home', path: '/' },
+          { name: 'Body', path: '/body/' },
+          { name: config.title, path: config.routePrefix },
+          { name: item.name, path },
+        ]),
+      ]}
+    >
   <nav aria-label="Breadcrumb" class="mb-6">
     <ol class="flex flex-wrap items-center gap-2 text-sm text-clay">
       <li><a href="/" class="hover:text-saffron-deep hover:underline">Home</a></li>
@@ -270,3 +282,5 @@ const balancing = DOSHAS.filter((d) => item.doshaEffects[d] === 'balancing');
     </aside>
   </div>
 </PageLayout>
+  )
+}

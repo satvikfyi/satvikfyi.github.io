@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/cumin/"
 name: Cumin
 slug: cumin
 sanskritName: Jīraka

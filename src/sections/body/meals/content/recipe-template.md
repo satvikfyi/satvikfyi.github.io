@@ -1,8 +1,13 @@
 ---
-# Recipe template, copy into content/recipes/{slug}.md, rename the copy to
-# match the slug, and fill in every field. This file itself lives outside
-# the recipes/ folder on purpose: the content-collection loader only reads
+# Recipe template for the HOSTED collection: copy into
+# content/recipes/{slug}.md (this folder), rename the copy to match the
+# slug, and fill in every field. This file itself lives outside the
+# recipes/ folder on purpose: the content-collection loader only reads
 # content/recipes/**/*.md, so a template there would become a (broken) page.
+#
+# Hosting policy: satvik only — no onion, garlic, or mushroom
+# ingredients, ever. Non-satvik family recipes are archived in the
+# repository at content/recipes/non-satvik/ and are never hosted.
 #
 # Everything below must satisfy schemas/recipe.ts, the build fails on any
 # violation, which is the quality gate working as designed. Comments after
@@ -43,8 +48,8 @@ sources:
   # - title: "Charaka Samhita"
   #   reference: "Sūtrasthāna 27: mudga among the wholesome pulses"
 
-# Reuse canonical item names already in other recipes (ghee, ginger
-# (fresh), coconut (fresh grated), moong dal (split yellow), …) so the
+# Reuse canonical item names already in other recipes (ghee, ginger,
+# coconut (fresh grated), moong dal (split yellow), …) so the
 # planner's shopping list groups them. Quantity must read as
 # "amount unit" (1 cup, ½ tsp, 2 tbsp, 200 g, 1 inch piece) for the
 # shopping list to sum it: or a note like "to taste". Plain counts may

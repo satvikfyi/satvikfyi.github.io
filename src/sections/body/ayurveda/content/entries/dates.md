@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/dates/"
 name: Dates
 slug: dates
 sanskritName: Kharjūra

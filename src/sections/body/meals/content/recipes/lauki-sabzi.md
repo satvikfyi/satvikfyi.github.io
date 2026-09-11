@@ -29,11 +29,11 @@ ingredients:
     quantity: 1 tbsp
   - item: cumin seeds
     quantity: ½ tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
   - item: turmeric powder
     quantity: ⅛ tsp
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: coriander powder

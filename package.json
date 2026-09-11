@@ -9,7 +9,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "astro build && pagefind --site dist",
     "preview": "astro preview",
     "check": "astro check",
     "check:links": "node scripts/check-links.mjs",
@@ -23,11 +23,11 @@
     "@tailwindcss/typography": "^0.5.15",
     "@tailwindcss/vite": "^4.0.0",
     "astro": "^5.0.0",
-    "fuse.js": "^7.5.0",
     "tailwindcss": "^4.0.0"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.4",
+    "pagefind": "^1.5.2",
     "typescript": "^5.5.0"
   }
 }

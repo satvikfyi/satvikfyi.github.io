@@ -38,9 +38,9 @@ ingredients:
     quantity: ½ tsp
   - item: turmeric powder
     quantity: ¼ tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: curry leaves

@@ -19,7 +19,7 @@ followed by the concrete decisions made while building Phase 0.
 | Comments            | Giscus (GitHub Discussions), later      | Free, static-friendly                                                                                  |
 | Shop                | Subdomain redirect → external free svc   | No native e-commerce                                                                                   |
 | Community           | Subdomain redirect → external free svc   | No native forum                                                                                        |
-| Search              | Build-time JSON index + client Fuse.js   | Static, offline-capable; later phase                                                                  |
+| Search              | ~~Build-time JSON index + client Fuse.js~~ → **Pagefind** (decision 16) | Static, offline-capable, self-hosted; full-content search                                |
 
 Superseded attempts (context only): `website/20250806` (Next.js + Prisma),
 `website/20250807` and `prompts/website/20251216` (unresolved-stack PRDs).
@@ -81,3 +81,80 @@ Superseded attempts (context only): `website/20250806` (Next.js + Prisma),
 14. **No analytics, no cookies, no external embeds in Phase 0**; the only
     third-party HTML on any page is none; YouTubeEmbed exists in shared but
     is unused until modules need it.
+
+## Content architecture decisions (2026-09-10)
+
+15. **`content/recipes/` is strictly an archive; the hosted collection is
+    the website folder; non-satvik is never hosted.** The archive keeps
+    `satvik/` (51 home recipes), `non-satvik/` (personal-use recipes,
+    excluded from hosting by policy) and `recipes_new/` (100 satvik temple
+    recipes + master catalog + generation scripts). The hosted collection
+    at `src/sections/body/meals/content/recipes/` is flat, satvik-only,
+    and received all 100 temple recipes on 2026-09-10. The ingredient
+    audit (`content/scripts/audit-ingredients.py`) now gates the hosted
+    collection by default and scans the archive only with `--all`. Full
+    scheme: `docs/recipe-taxonomy.md` (fields v2 pending family review).
+
+16. **Search moved from Fuse.js to Pagefind (2026-09-11)**, superseding
+    the fixed-decision table's original search row. The build script is
+    now `astro build && pagefind --site dist` (pagefind is a
+    devDependency, so CI picks it up via `npm run build` with no
+    workflow edits). `BaseLayout` marks `<main data-pagefind-body>` so
+    only page content is indexed (chrome never leaks into results),
+    carries `section`/`description` result metadata via
+    `data-pagefind-meta`, and excludes `noindex` pages from the index.
+    Removed: `search/lib/index-builder.ts`, both
+    `src/pages/search/*.json.ts` endpoints, the `fuse.js` dependency,
+    and the 300 KB single-index budget (Pagefind chunks its index).
+    `check:search` now gates that `dist/pagefind/` exists and covers
+    the site. Rationale: the old index searched only titles/summaries/
+    tags — recipes were unfindable by ingredient — and every new module
+    needed hand-wiring; Pagefind indexes full rendered content
+    (289 pages, verified in-browser: "tamarind" → 26 results, "tej
+    patta" → 14) and needs none.
+
+17. **The wiki became the unified knowledge layer (2026-09-11)**, per
+    `docs/unified-wiki.md`: two new categories (`ingredients`,
+    `cooking-techniques`, domain-qualified so technique explainers for
+    other pillars stay in `concepts`); the optional `dravya` frontmatter
+    section with strict enums (the ghee rule: one entry, kitchen and
+    ayurveda inside); and the recipe ↔ wiki two-way link via
+    `src/shared/lib/ingredientBridge.ts` — an explicit `ingredientItem`
+    frontmatter field matching the canonical ingredient name joins
+    forward links on recipe pages (items without entries stay text) to
+    "Used in N recipes" backlinks on entries (one inverted map per
+    build). 44 articles seeded/converted; the 15 overlapping ayurveda
+    entries script-converted into `dravya` entries with their old URLs
+    now soft-redirect stubs (`movedTo` field; meta-refresh + canonical
+    to the wiki URL, no noindex, `searchExclude`d from Pagefind —
+    Astro config-level redirects are ruled out because they bypass
+    BaseLayout). The ayurveda module keeps the 5 medicinal herbs.
+    Verified in-browser: dalma links its six covered ingredients, ghee
+    shows its dravya profile and "Used in 104 recipes",
+    /body/ayurveda/ghee/ redirects, and "sendha namak" finds the
+    rock-salt entry.
+
+18. **Build folder renamed `20260822` → `20260910`; deployment model
+    settled (2026-09-11)**: the live site runs from its own repository
+    whose root is this folder's content, delivered as `<build>.zip`
+    (e.g. `20260910.zip`) from the `satvikfyi_assets` archive repo —
+    which gitignores the open `website/` folder and never deploys. The
+    CI and deploy workflows therefore stay INSIDE the build folder
+    (`.github/workflows/`, no working-directory, `path: ./dist`), where
+    they run from the live repo's root as-is; the zip must include the
+    dotfiles (workflows + `.gitignore`) to be complete for live. (A
+    same-day attempt to relocate the workflows to the assets repo root
+    was reverted when the family clarified the model.) The rename was
+    propagated to the archive-side scripts
+    (`content/scripts/audit-ingredients.py`,
+    `migrate-ingredient-names.py`), the archive docs, and every manual
+    path reference; `prompts/` and the historical entries above keep
+    the old name as history. Also recorded here: the **listing-default
+    rule** (meaningful-facet grouping with A–Z inside for small
+    collections; flat A–Z past ~40–50 items; sort controls only when
+    scale or a second key justifies them; blogs stay newest-first —
+    now `docs/adding-a-module.md` step 5b), and the handoff-zip
+    procedure in the deployment manual. Handover docs (readme, manual
+    1–3, module READMEs) refreshed for future moderators, volunteers,
+    and LLM sessions; the readme's "read the decision log first" note
+    is the intended entry point for AI maintainers.

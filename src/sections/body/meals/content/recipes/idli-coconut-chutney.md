@@ -35,7 +35,7 @@ ingredients:
   - item: green chili
     quantity: 1
     note: optional
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: ½ inch piece
   - item: tamarind
     quantity: 1 tsp

@@ -26,7 +26,7 @@ ingredients:
   - item: almonds
     quantity: 10
     note: soaked 4 hours, peeled
-  - item: saffron strands
+  - item: 'saffron threads'
     quantity: 1 pinch
   - item: cardamom powder
     quantity: ¼ tsp

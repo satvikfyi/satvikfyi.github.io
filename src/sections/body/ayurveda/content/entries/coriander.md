@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/coriander/"
 name: Coriander
 slug: coriander
 sanskritName: Dhānyaka

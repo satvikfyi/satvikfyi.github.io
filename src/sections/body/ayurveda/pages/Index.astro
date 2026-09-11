@@ -16,6 +16,9 @@ import { DOSHAS, ENTRY_KINDS, doshaLabel, entryKindLabel } from '../lib/domain';
 
 const entries = await getCollection('ayurveda-entries');
 const items = entries
+  // Entries migrated to the wiki render redirect stubs at their URLs but
+  // no longer appear in the listing.
+  .filter((entry) => !entry.data.movedTo)
   .map((entry) => entry.data)
   .sort((a, b) => a.name.localeCompare(b.name, 'en'));
 

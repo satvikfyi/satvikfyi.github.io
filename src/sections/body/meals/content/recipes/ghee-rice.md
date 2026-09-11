@@ -29,13 +29,13 @@ ingredients:
     quantity: 2 tbsp
   - item: cumin seeds
     quantity: ½ tsp
-  - item: cardamom pods
+  - item: 'green cardamom'
     quantity: 2
   - item: cloves
     quantity: 3
   - item: cinnamon stick
     quantity: 1 inch piece
-  - item: bay leaf
+  - item: 'tej patta (Indian bay leaf)'
     quantity: 1
   - item: rock salt
     quantity: to taste

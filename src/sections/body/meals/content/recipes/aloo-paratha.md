@@ -20,7 +20,7 @@ seasonalSuitability:
   - all-year
 dietNotes: The notebook's filling stays satvik, ginger, green chili and coriander instead of onion; a spoon of curd in the dough keeps the paratha soft.
 ingredients:
-  - item: wheat flour (atta)
+  - item: 'atta (whole wheat flour)'
     quantity: 2 cups
     note: plus extra for rolling
   - item: water
@@ -32,7 +32,7 @@ ingredients:
   - item: potato
     quantity: 3
     note: boiled, mashed smooth
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: green chili

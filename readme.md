@@ -1,55 +1,65 @@
-# Satvik.fyi: website build 20260822
+# Satvik.fyi: website build 20260910
 
-A different approach to website building.
-Z.ai code plan use.
-
-Master prompt for this iteration: [prompts/website/20260822.md](../../prompts/website/20260822.md).
-Blank slate. Stack fixed to **Astro + Tailwind (v4) + TypeScript (strict) + Zod**.
-Hierarchical module system (Body/Mind/Soul pillars, features as modules;
-meals is the first module under `/body/`). Phases 0–6, each with a
-standalone AI build prompt, built one phase per session, in order.
+A different approach to website building, developed with AI sessions
+(Z.ai code plan). The build folder is named `20260910` to mark the
+content milestone: 151 recipes, the unified wiki, and Pagefind search.
+Origin prompt for the iteration that started this codebase:
+[prompts/website/20260822.md](../../prompts/website/20260822.md).
 
 **Operating the site?** Read the [operations manual](./docs/manual/README.md):
 content and volunteer editorial guide, VS Code workflow and architecture,
-deployment and troubleshooting.
+deployment and troubleshooting. **Maintaining it with AI sessions?** The
+decision log (`docs/decision-log.md`) is the contract — read it first.
 
 ## Status
 
-**Phases 0–5 complete**: all 14 registered modules live (meals, yoga,
-ayurveda, quiz, pranayama, meditation, mantras, five soul paths, blog,
-wiki, search), 189 pages, five CI gates. Each module documents itself in
-its own README under `src/sections/`.
+All 14 registered modules live (meals, yoga, ayurveda, quiz, pranayama,
+meditation, mantras, five soul paths, blog, wiki, search), **333 pages**,
+five CI gates. Each module documents itself in its own README under
+`src/sections/`.
 
-- Section registry (`src/config/sections.ts`) with meals enabled and all
-  future modules (yoga, ayurveda, pranayama, meditation, mantras, soul
-  paths, quiz, blog, wiki, search) registered as disabled placeholders.
+- **Meals**: 151 validated recipes (51 home satvik + 100 satvik temple
+  classics), alphabetical listing with a sort control, filter island,
+  planner, shopping list; ingredient names canonicalized against
+  `content/recipes/ingredients.json` (repo archive; the organization
+  scheme is `docs/recipe-taxonomy.md`).
+- **Wiki**: the site's unified knowledge layer — scriptures, books,
+  deities, worship, concepts, **ingredients**, **cooking techniques** —
+  with two-way links to recipes (`src/shared/lib/ingredientBridge.ts`):
+  recipe pages link their ingredients, ingredient entries list the
+  recipes using them. Former ayurveda substance pages soft-redirect to
+  their wiki entries.
+- **Search**: Pagefind over the full rendered site (post-build step in
+  `npm run build`); self-hosted, offline after first load, alt-names in
+  entry bodies are searchable.
 - Shared layer: layouts, UI primitives, satvik design tokens (WCAG-AA
   verified), SEO/JSON-LD helpers, versioned localStorage store.
-- Pages: home (pillars + planner CTA + roadmap), `/body/ /mind/ /soul/`
-  pillar landings, `/body/meals/` stub, `/about/ /contact/ /privacy/
-  /disclaimer/`, 404. Zero client JavaScript shipped.
-- CI (`astro check` + build + internal link check + Lighthouse CI) and
-  GitHub Pages deploy workflow; CNAME `satvik.fyi`.
 
 ## Quickstart
 
 ```bash
 nvm use 22        # or any Node >= 18.17.1
 npm ci
-npm run dev       # http://localhost:4321
-npm run verify    # astro check + build + link check (what CI runs)
+npm run dev       # http://localhost:4321 (search needs npm run preview)
+npm run verify    # check + build + links + search + seo (what CI runs)
 ```
 
 ## Docs
 
 - [docs/prd.md](docs/prd.md): the adapted master specification, sitemap,
   schemas, governance principles, phase acceptance criteria.
-- [docs/decision-log.md](docs/decision-log.md): fixed decisions + Phase 0
-  build decisions (Tailwind v4 CSS-first, workflow placement, etc.).
+- [docs/decision-log.md](docs/decision-log.md): fixed decisions and every
+  build decision since (search, wiki, migrations) — start here.
 - [docs/adding-a-module.md](docs/adding-a-module.md): the module contract
-  as a step-by-step how-to; read this before Phase 1.
+  as a step-by-step how-to.
+- [docs/recipe-taxonomy.md](docs/recipe-taxonomy.md) and
+  [docs/unified-wiki.md](docs/unified-wiki.md): the content architecture
+  for recipes and the knowledge layer.
 
-> **Workflow note**: GitHub only reads workflows from the repository root.
-> This folder is laid out to be its own site repository. If it stays nested
-> in `satvikfyi_assets`, move `.github/workflows/` to the repo root and set
-> `working-directory: website/20260822` (see the note atop each workflow).
+> **Deployment model**: the live site runs from its own repository whose
+> root is this folder's content, delivered as `<build>.zip` from the
+> `satvikfyi_assets` repo. The CI and deploy workflows ship inside this
+> folder (`.github/workflows/`) and run from the live repo's root as-is;
+> the assets repo archives builds and does not deploy. One-time live-repo
+> activation (Pages source, DNS) is documented in the
+> [deployment manual](docs/manual/03-deployment-and-troubleshooting.md).

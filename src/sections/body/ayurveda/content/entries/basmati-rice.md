@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/basmati-rice/"
 name: Basmati Rice
 slug: basmati-rice
 sanskritName: Śāli-taṇḍula

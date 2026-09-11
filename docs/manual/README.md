@@ -23,7 +23,7 @@ module stands alone.
 ## The one-page cheat sheet
 
 ```bash
-cd website/20260822          # the site lives in this sub-folder of the repo
+cd website/20260910          # the site lives in this sub-folder of the repo
 npm run dev                  # local preview at http://localhost:4321
 npm run verify               # ALL quality gates (run before every push)
 git pull                     # never push on a stale branch

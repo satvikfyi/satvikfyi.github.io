@@ -21,14 +21,14 @@ ingredients:
     note: medium, in bite florets
   - item: maida (refined flour)
     quantity: ½ cup
-  - item: corn flour
+  - item: 'cornstarch'
     quantity: ¼ cup
   - item: water
     quantity: ½ cup
     note: for the batter
   - item: red chili powder
     quantity: ½ tsp
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: ¼ tsp
   - item: rock salt
     quantity: to taste
@@ -38,7 +38,7 @@ ingredients:
   - item: garlic
     quantity: 5 cloves
     note: minced
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: minced
   - item: green chili

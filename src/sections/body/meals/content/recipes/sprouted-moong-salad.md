@@ -36,7 +36,7 @@ ingredients:
   - item: lemon
     quantity: 1 tbsp
     note: juice
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: ½ tsp
     note: grated
   - item: rock salt

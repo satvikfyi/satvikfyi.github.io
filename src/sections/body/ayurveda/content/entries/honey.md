@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/honey/"
 name: Honey
 slug: honey
 sanskritName: Madhu

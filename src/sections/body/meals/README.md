@@ -6,6 +6,15 @@ planner island. Everything the module owns lives in this folder; the only
 wires outside it are the route wrappers in `src/pages/body/meals/` and the
 collection registration in `src/content.config.ts`.
 
+The collection holds 151 recipes: 51 home satvik recipes plus 100 satvik
+temple recipes imported on 2026-09-10 from the repository archive
+(`content/recipes/recipes_new/`, which keeps the master catalog and the
+generation scripts). Hosting policy: **satvik only** — no onion, garlic,
+or mushroom ingredients in anything hosted. Non-satvik family recipes
+live in the archive (`content/recipes/non-satvik/`) and are never
+hosted. The organization scheme and planned field extensions live in
+`docs/recipe-taxonomy.md`.
+
 ## Map
 
 ```
@@ -57,6 +66,8 @@ via the store's `version` argument; a bump orphans old data safely.
 Conventions that keep the shopping list tidy:
 
 - `slug` must match the file name (kebab-case).
+- Satvik only: no onion, garlic, or mushroom `item` may appear —
+  non-satvik family recipes belong in the archive, never here.
 - Ingredient `item` strings are the grouping key, reuse canonical names
   (`ghee`, `moong dal (split yellow)`, `coconut (fresh grated)`, …).
 - `quantity` should parse as `amount unit` (`1 cup`, `½ tsp`, `2 tbsp`,
@@ -66,10 +77,15 @@ Conventions that keep the shopping list tidy:
 
 ## Filtering semantics
 
-- **Dosha filter** shows recipes whose `doshaEffects[dosha]` is `balancing`.
+- The grid renders **alphabetically by title** (server-side, so the
+  no-JS view is already in a stable order).
+- The Sort select re-orders cards client-side: `A to Z` (default),
+  `Quickest to cook`, `Longest to cook`; deep-linkable via
+  `?sort=title|time|time-desc`. "Clear filters" never resets the sort.
+- **Dosha filter** shows recipes whose `doshaEffects[dosha] is `balancing`.
 - **Season filter** shows recipes listing the season or `all-year`.
 - Meal and tag filters match exactly. All filters AND together.
-- Deep links: `/body/meals/?dosha=vata&meal=breakfast&season=summer&tag=light`.
+- Deep links: `/body/meals/?dosha=vata&meal=breakfast&season=summer&tag=light&sort=time`.
 
 ## Disabling
 

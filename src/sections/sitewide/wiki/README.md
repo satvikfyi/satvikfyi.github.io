@@ -1,9 +1,11 @@
 # Wiki module (Phase 4, sitewide)
 
-The knowledge base at `/wiki/`, scriptures, books, deities, worship methods
-and concepts. **Authoring an article = adding one markdown file with a
-category**; the alphabetical index, category page, article page, related
-links and backlinks all derive from the `wiki-articles` collection.
+The site's unified knowledge base at `/wiki/`: scriptures, books, deities,
+worship methods, concepts, **ingredients** and **cooking techniques**
+(docs/unified-wiki.md — modules own practice, the wiki owns meaning).
+**Authoring an article = adding one markdown file with a category**; the
+alphabetical index, category page, article page, related links and
+backlinks all derive from the `wiki-articles` collection.
 
 ## Map
 
@@ -13,7 +15,7 @@ wiki/
 ├── schemas/article.ts    # Zod schema for `wiki-articles`
 ├── content/articles/*.md # the articles
 ├── lib/
-│   ├── domain.ts         # the five fixed categories + href helpers
+│   ├── domain.ts         # categories, dravya vocabularies + href helpers
 │   └── articles.ts       # alphabetical order, slug map, backlinks
 ├── components/ArticleCard.astro
 └── pages/
@@ -23,6 +25,30 @@ wiki/
 ```
 
 Route wiring: `src/pages/wiki/{index,[category]/index,[category]/[slug]}.astro`.
+
+## Ingredients & the recipe bridge
+
+- Ingredient entries carry `ingredientItem` — the **canonical name from
+  `content/recipes/ingredients.json`**, spelled exactly. That field is the
+  join key for both directions of the recipe ↔ wiki link (implemented in
+  `src/shared/lib/ingredientBridge.ts`, consumed by this module and the
+  meals module):
+  - **Forward**: recipe pages link each ingredient item that has an entry
+    to `/wiki/ingredients/{slug}/`; items without entries stay plain text.
+  - **Backward**: ingredient entries render "Used in N recipes" from one
+    inverted map computed per build.
+- The optional `dravya` frontmatter object (strict enums, kept in sync
+  with the ayurveda module's vocabularies) renders an āyurvedic profile
+  table — the ghee rule: one entry, kitchen and ayurveda sections inside.
+- Naming conventions: alt-names (sendha namak, saindhava) live in the
+  body prose — Pagefind makes them searchable for free. Sibling forms
+  cross-link via `related[]`. A divine form gets its own entry titled
+  with the honorific ("Tulsi Devi"), cross-linked to the ingredient
+  entry.
+- 15 former ayurveda-module entries were converted (2026-09-11); their
+  old URLs render soft-redirect stubs via that module's `movedTo` field
+  (canonical to the wiki entry, excluded from the search index). The 5
+  medicinal herbs stayed in `/body/ayurveda/`.
 
 ## Cross-references
 

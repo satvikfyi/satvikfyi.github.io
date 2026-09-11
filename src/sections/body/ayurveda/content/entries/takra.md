@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/takra/"
 name: Spiced Buttermilk
 slug: takra
 sanskritName: Takra

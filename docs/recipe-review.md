@@ -1,7 +1,8 @@
 # Recipe Review Plan
 
-How the family gradually goes over the 51 recipes in the meals module and
-corrects them to taste. This is the working agreement between the family
+How the family gradually goes over the 151 recipes in the meals module —
+the 51 home recipes plus the 100 temple recipes imported on 2026-09-10 —
+and corrects them to taste. This is the working agreement between the family
 (who know the dishes) and whoever maintains the site (AI sessions or
 otherwise, who know the files).
 
@@ -29,10 +30,14 @@ handwriting and need the most eyes), originals second:
 | 4 | Notebook snacks & sweets | cucumber-raita, mint-chutney, tomato-chutney, dahi-pachadi, mango-ice-cream, mysore-pak, paneer-chilli, gobi-manchurian |
 | 5–9 | Original breakfasts/lunches/dinners/snacks | the 27 seeded recipes, same meal-type groupings |
 | 10 | Cross-cutting pass | dosha tags against docs/ayurvedic-classification.md, seasons, sources |
+| 11–13 | Temple classics I | catalog batches 1–4 (rice & grains, dals, saarus) — 40 recipes; membership listed in `content/recipes/recipes_new/content/recipes-catalog.md` |
+| 14–15 | Temple classics II | catalog batches 5–7 (sabzis, gravies, paneer & kofta) — 30 recipes |
+| 16–17 | Temple classics III | catalog batches 8–10 (breads & tiffin, chutneys, sweets) — 30 recipes |
+| 18 | Temple cross-cutting pass | shrine attributions in `sources`, festival/occasion wording, and the cashew-bearing Puri recipes `puri-kanika` & `puri-chhena-poda` (docs/recipe-taxonomy.md, open question 3) |
 
 ## The review session (each batch)
 
-1. **Open the site**, `npm run dev` from `website/20260822/`, then browse
+1. **Open the site**, `npm run dev` from `website/20260910/`, then browse
    `/body/meals/` and use the filters to see only the batch (or just open
    the recipes from the listing).
 2. **Read each page as a cook, not an editor**; would this recipe, cooked
@@ -63,6 +68,9 @@ handwriting and need the most eyes), originals second:
 5. **Sources**, corrections to citations, family attribution wording.
 6. **Satvik adaptations**, confirm which onion/garlic adaptations should
    stand and which dishes should remain "as-is family food".
+7. **Temple recipe authenticity**, whether the shrine attribution and
+   canon details in `sources` ring true; flag anything doubtful against
+   `docs/recipe-taxonomy.md` (its open questions collect these).
 
 ## Editorial conventions (keep the collection coherent)
 
@@ -75,3 +83,6 @@ handwriting and need the most eyes), originals second:
   the build fails (by design; it has caught us three times).
 - One recipe = one file = `content/recipes/{slug}.md`; nothing else needs
   touching to publish it.
+- Hosted recipes are satvik only (no onion, garlic, or mushroom
+  ingredients); non-satvik family recipes live in the repository archive
+  (`content/recipes/non-satvik/`) and are never hosted.

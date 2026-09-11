@@ -32,9 +32,9 @@ ingredients:
     quantity: 1 tbsp
   - item: cumin seeds
     quantity: 1 tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
-  - item: red chili
+  - item: 'dry red chili'
     quantity: 1
     note: whole dried
   - item: red chili powder

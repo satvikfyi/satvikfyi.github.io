@@ -29,7 +29,7 @@ ingredients:
     quantity: 1 tbsp
   - item: cumin seeds
     quantity: ½ tsp
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: green chili
@@ -38,7 +38,7 @@ ingredients:
   - item: tomato
     quantity: 1
     note: chopped
-  - item: peas (green)
+  - item: 'green peas'
     quantity: ½ cup
   - item: turmeric powder
     quantity: ⅛ tsp

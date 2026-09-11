@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/ginger/"
 name: Ginger
 slug: ginger
 sanskritName: Ārdraka (fresh) / Śuṇṭhī (dried)

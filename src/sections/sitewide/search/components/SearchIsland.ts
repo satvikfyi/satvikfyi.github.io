@@ -2,72 +2,72 @@
  * Search island, the interactive half of /search/.
  *
  * The server renders the page (input, results region, and a no-JS note with
- * pillar links); this script takes over: it fetches the merged JSON index
- * **once** (same-origin static asset, cached by the browser thereafter, so
- * search keeps working offline) and runs Fuse.js over it, debounced, with
- * deep-link support via ?q=. Self-contained vanilla TS + Fuse.js; nothing
- * is fetched per keystroke.
+ * pillar links); this script takes over: it loads the Pagefind runtime
+ * **once** (same-origin static assets under /pagefind/, built after
+ * `astro build`, cached by the browser thereafter, so search keeps working
+ * offline) and queries it, debounced, with deep-link support via ?q=.
+ * Self-contained vanilla TS; nothing is fetched per keystroke and nothing
+ * leaves the browser.
+ *
+ * The runtime only exists after a build — under `npm run dev` the import
+ * fails and the status line says so; use `npm run preview` to try search.
  */
-import Fuse from 'fuse.js';
-import type { SearchDoc } from '../lib/index-builder';
 
-const INDEX_URL = '/search/index.json';
+const PAGEFIND_URL = '/pagefind/pagefind.js';
 const RESULT_LIMIT = 14;
 
-interface LoadedImage {
-  fuse: Fuse<SearchDoc>;
-  docs: SearchDoc[];
+interface PagefindResultData {
+  url: string;
+  excerpt: string;
+  meta: { title?: string; description?: string; section?: string };
 }
 
-let loaded: Promise<LoadedImage> | null = null;
+interface Pagefind {
+  search(query: string): Promise<{ results: PagefindResult[] }>;
+  preload?(query: string): Promise<void>;
+}
 
-function loadIndex(): Promise<LoadedImage> {
-  if (loaded) return loaded;
-  loaded = fetch(INDEX_URL)
-    .then((response) => {
-      if (!response.ok) throw new Error(`index ${response.status}`);
-      return response.json() as Promise<SearchDoc[]>;
-    })
-    .then((docs) => ({
-      docs,
-      fuse: new Fuse(docs, {
-        keys: [
-          { name: 't', weight: 0.6 },
-          { name: 'k', weight: 0.25 },
-          { name: 'd', weight: 0.15 },
-        ],
-        threshold: 0.35,
-        ignoreLocation: true,
-        minMatchCharLength: 2,
-      }),
-    }))
+interface PagefindResult {
+  data(): Promise<PagefindResultData>;
+}
+
+let pagefindPromise: Promise<Pagefind> | null = null;
+
+function loadPagefind(): Promise<Pagefind> {
+  if (pagefindPromise) return pagefindPromise;
+  // Variable specifier + @vite-ignore: the module is a build-output asset,
+  // invisible to both TypeScript resolution and Vite's static analysis.
+  const url = PAGEFIND_URL;
+  pagefindPromise = import(/* @vite-ignore */ url)
+    .then((mod) => mod as unknown as Pagefind)
     .catch((error) => {
-      loaded = null; // allow a retry after a transient failure
+      pagefindPromise = null; // allow a retry after a transient failure
       throw error;
     });
-  return loaded;
+  return pagefindPromise;
 }
 
-function resultItem(hit: SearchDoc): HTMLLIElement {
+function resultItem(hit: PagefindResultData): HTMLLIElement {
   const item = document.createElement('li');
   item.className = 'rounded-2xl border border-sand bg-parchment/60 p-5';
 
   const link = document.createElement('a');
-  link.href = hit.u;
+  link.href = hit.url;
   link.className = 'group block';
 
   const meta = document.createElement('p');
   meta.className = 'text-xs font-semibold tracking-wide text-sage-deep uppercase';
-  meta.textContent = hit.c;
+  meta.textContent = hit.meta.section ?? 'Pages';
 
   const title = document.createElement('p');
   title.className =
     'mt-1 font-display text-lg font-semibold text-earth group-hover:underline group-hover:decoration-2 group-hover:underline-offset-4';
-  title.textContent = hit.t;
+  title.textContent = hit.meta.title ?? hit.url;
 
   const desc = document.createElement('p');
   desc.className = 'mt-1 text-sm leading-relaxed text-clay';
-  desc.textContent = hit.d;
+  desc.textContent =
+    hit.meta.description?.trim() || hit.excerpt.replace(/<\/?mark>/g, '').trim();
 
   link.append(meta, title, desc);
   item.append(link);
@@ -97,7 +97,7 @@ export function mountSearch(root: HTMLElement | null): void {
   const showError = (): void => {
     results.replaceChildren();
     setStatus(
-      'The search index could not be loaded, check your connection and try again. Everything else on this page works.',
+      'The search index could not be loaded. It exists only after a build: run npm run preview (not npm run dev), or reload once you are back online.',
     );
   };
 
@@ -106,14 +106,20 @@ export function mountSearch(root: HTMLElement | null): void {
       showIdle();
       return;
     }
-    loadIndex()
-      .then(({ fuse, docs }) => {
-        const hits = fuse.search(query, { limit: RESULT_LIMIT }).map((r) => r.item);
+    loadPagefind()
+      .then(async (pagefind) => {
+        const response = await pagefind.search(query);
+        const hits = await Promise.all(
+          response.results.slice(0, RESULT_LIMIT).map((result) => result.data()),
+        );
         results.replaceChildren(...hits.map(resultItem));
+        const total = response.results.length;
         setStatus(
-          hits.length === 0
+          total === 0
             ? `No matches for “${query}”.`
-            : `${hits.length} result${hits.length === 1 ? '' : 's'} for “${query}” (of ${docs.length} pages)`,
+            : total === hits.length
+              ? `${total} result${total === 1 ? '' : 's'} for “${query}”`
+              : `${total} results for “${query}” (showing the first ${hits.length})`,
         );
       })
       .catch(showError);
@@ -136,10 +142,10 @@ export function mountSearch(root: HTMLElement | null): void {
     timer = window.setTimeout(() => runSearch(query), 140);
   });
 
-  // Warm the index as soon as the searcher interacts, so the first
+  // Warm the runtime as soon as the searcher interacts, so the first
   // results appear without a visible pause.
   input.addEventListener('focus', () => {
-    void loadIndex().catch(() => {
+    void loadPagefind().catch(() => {
       /* surfaced on search */
     });
   });

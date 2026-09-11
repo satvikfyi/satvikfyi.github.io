@@ -26,7 +26,7 @@ ingredients:
   - item: coriander leaves
     quantity: 1 cup
     note: packed, with tender stems
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: chopped
   - item: green chili

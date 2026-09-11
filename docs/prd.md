@@ -1,7 +1,7 @@
 # Satvik.fyi — Product Requirements (Phase 0 adaptation)
 
 This document adapts the Master AI Build Specification v5 for the site built
-in `website/20260822/`. The decision log is fixed and is not re-litigated;
+in `website/20260910/`. The decision log is fixed and is not re-litigated;
 see `decision-log.md`.
 
 ## What this is
@@ -79,7 +79,7 @@ logic in shared.
 | `/soul/{action,knowledge,devotion,meditation,tantra}/` | Soul paths | 3 |
 | `/blog/`, `/blog/{slug}/`, `/blog/tag/{tag}/` | Blog             | 4     |
 | `/wiki/`, `/wiki/{category}/{slug}/` | Wiki (scriptures, books, gods, worship) | 4 |
-| `/search/`                           | Global search (Fuse.js)       | 5     |
+| `/search/`                           | Global search (Pagefind, decision 16) | 5     |
 | `/about/ /contact/ /privacy/ /disclaimer/` | Static pages            | 0     |
 | `shop.satvik.fyi`, `community.satvik.fyi` | DNS redirects → external   | 6     |
 

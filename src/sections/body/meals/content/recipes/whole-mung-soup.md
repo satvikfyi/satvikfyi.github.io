@@ -22,7 +22,7 @@ seasonalSuitability:
   - monsoon
 dietNotes: Whole mung is heartier than split, soak it an hour if digestion is delicate, and cook until the beans begin to break down.
 ingredients:
-  - item: whole green moong
+  - item: 'green moong'
     quantity: ¾ cup
     note: soaked 1 hour
   - item: water
@@ -33,7 +33,7 @@ ingredients:
     quantity: 1 tbsp
   - item: cumin seeds
     quantity: 1 tsp
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: tomato
@@ -41,7 +41,7 @@ ingredients:
     note: chopped
   - item: coriander powder
     quantity: 1 tsp
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: ¼ tsp
     note: freshly ground
   - item: rock salt

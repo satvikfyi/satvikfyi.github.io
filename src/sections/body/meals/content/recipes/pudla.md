@@ -38,7 +38,7 @@ ingredients:
     quantity: ½ tsp
   - item: turmeric powder
     quantity: ⅛ tsp
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: ½ tsp
     note: grated
   - item: green chili

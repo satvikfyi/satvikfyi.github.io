@@ -30,7 +30,7 @@ ingredients:
   - item: tomato
     quantity: 1
     note: chopped
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: green chili
@@ -51,7 +51,7 @@ ingredients:
     quantity: ½ tsp
   - item: curry leaves
     quantity: 8
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: ¼ tsp
   - item: rock salt
     quantity: to taste

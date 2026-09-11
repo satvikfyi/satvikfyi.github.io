@@ -43,6 +43,14 @@ export const ayurvedaEntrySchema = z.object({
   preparation: z.string().trim().min(1),
   /** Path under /assets/images/ayurveda/, optional. */
   image: z.string().optional(),
+  /**
+   * Site-relative URL of this entry's new home in the wiki. Entries with
+   * this field render a soft-redirect stub (meta-refresh + canonical to
+   * the wiki URL, excluded from the search index) instead of their
+   * content, and drop out of the listing. Fully reversible: remove the
+   * field and the entry returns.
+   */
+  movedTo: z.string().trim().optional(),
   sources: z.array(sourceSchema).min(1),
 });
 

@@ -143,6 +143,18 @@ AUTHOR:       (name as it should appear, or "Anonymous")
 5. Transpose into the collection template (Module 2, §3) and let the build
    gates do the rest.
 
+Recipe-specific policy: hosted recipes are satvik only — submissions
+containing onion, garlic, or mushrooms are archived in the repository's
+`content/recipes/non-satvik/` for the family's personal record and are
+never hosted.
+
+Wiki-specific policy: ingredient and cooking-technique entries follow
+the conventions in `docs/unified-wiki.md` — one entry per canonical
+form, alt-names in the body, kitchen and ayurveda sections in one entry,
+and the exact canonical `ingredientItem` name from
+`content/recipes/ingredients.json` when the entry should link to
+recipes.
+
 ## 4. Asset specifications
 
 Images are optional per entry; when supplied they must meet these rules so

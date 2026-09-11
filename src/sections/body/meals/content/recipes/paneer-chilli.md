@@ -21,7 +21,7 @@ ingredients:
   - item: paneer
     quantity: 250 g
     note: cut into batons
-  - item: corn flour
+  - item: 'cornstarch'
     quantity: 3 tbsp
   - item: maida (refined flour)
     quantity: 2 tbsp
@@ -37,7 +37,7 @@ ingredients:
   - item: green chili
     quantity: 2
     note: slit
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: julienned
   - item: garlic

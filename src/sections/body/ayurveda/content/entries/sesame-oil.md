@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/sesame-oil/"
 name: Sesame Oil
 slug: sesame-oil
 sanskritName: Tila-taila

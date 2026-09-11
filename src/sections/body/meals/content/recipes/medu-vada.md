@@ -26,7 +26,7 @@ ingredients:
   - item: rice flour
     quantity: 1 tbsp
     note: optional, for a crisper crust
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: green chili
@@ -35,10 +35,10 @@ ingredients:
   - item: curry leaves
     quantity: 8
     note: chopped
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: ½ tsp
     note: coarsely crushed
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
   - item: rock salt
     quantity: to taste

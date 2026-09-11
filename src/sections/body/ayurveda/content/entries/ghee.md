@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/ghee/"
 name: Ghee
 slug: ghee
 sanskritName: Ghṛta

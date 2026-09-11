@@ -38,7 +38,7 @@ ingredients:
     quantity: 1 tsp
   - item: curry leaves
     quantity: 6
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: rock salt

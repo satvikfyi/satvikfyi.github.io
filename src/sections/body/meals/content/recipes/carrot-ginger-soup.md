@@ -27,14 +27,14 @@ ingredients:
     note: medium, sliced
   - item: ghee
     quantity: 1 tbsp
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: water
     quantity: 3 cups
   - item: rock salt
     quantity: to taste
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: ⅛ tsp
     note: freshly ground
   - item: coriander leaves

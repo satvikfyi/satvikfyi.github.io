@@ -25,7 +25,7 @@ ingredients:
   - item: sweet potato
     quantity: 2
     note: medium, cubed
-  - item: beans (green)
+  - item: 'green bean'
     quantity: 8
     note: cut into 1-inch pieces
   - item: coconut oil
@@ -37,7 +37,7 @@ ingredients:
     quantity: ½ tsp
   - item: curry leaves
     quantity: 8
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: turmeric powder

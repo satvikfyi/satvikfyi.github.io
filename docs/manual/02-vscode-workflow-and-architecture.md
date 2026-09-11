@@ -11,7 +11,7 @@ filters, search). No database, no backend, no client framework; the site is
 a folder of HTML plus small JS islands. Content is plain Markdown with YAML
 frontmatter.
 
-The site lives at `website/20260822/` inside the `satvikfyi_assets`
+The site lives at `website/20260910/` inside the `satvikfyi_assets`
 repository. All terminal commands in this manual run from that folder.
 
 **Important difference from stock Astro:** there is no top-level
@@ -19,7 +19,7 @@ repository. All terminal commands in this manual run from that folder.
 `src/pages/` contains only thin one-line wrappers. The layout:
 
 ```text
-website/20260822/
+website/20260910/
 ├── astro.config.mjs            # site URL, sitemap, Tailwind
 ├── package.json                # scripts: dev, build, preview, check, verify…
 ├── public/                     # copied verbatim to the site root
@@ -33,7 +33,7 @@ website/20260822/
     │   ├── site.ts             # global config: name, URL, footer, giscus
     │   └── sections.ts         # THE REGISTRY: every module's manifest
     ├── content.config.ts       # registers the 9 collections + schemas
-    ├── shared/                 # generic layer: layouts, components, seo, store
+    ├── shared/                 # generic layer: layouts, components, seo, store, lib (ingredientBridge)
     ├── pages/                  # thin route wrappers (isModuleEnabled guards)
     └── sections/
         ├── body/               # meals, yoga, ayurveda  (each a self-contained folder)
@@ -67,7 +67,7 @@ Prerequisites: **Node.js 22 LTS** (check with `node --version`) and Git.
 ```bash
 # 1. Clone the repository (first time on a machine)
 git clone https://github.com/aecabhijeet/satvikfyi_assets.git
-cd satvikfyi_assets/website/20260822
+cd satvikfyi_assets/website/20260910
 
 # 2. Install dependencies (also after every pull that touches package.json)
 npm install
@@ -86,7 +86,7 @@ npm run build          # production build into dist/
 npm run preview        # serve the built site (http://localhost:4321)
 npm run check          # types + frontmatter schema validation only
 npm run check:links    # every internal link/asset must resolve in dist/
-npm run check:search   # search index exists and is under 300 KB
+npm run check:search   # Pagefind index exists and covers the whole site
 npm run check:seo      # canonicals, og:image, JSON-LD, robots, sitemap
 ```
 
@@ -115,7 +115,7 @@ comments and harmless to keep).
 Worked example, adding a pose:
 
 ```bash
-cd website/20260822
+cd website/20260910
 cp src/sections/body/yoga/content/pose-template.md \
    src/sections/body/yoga/content/poses/ustrasana.md
 code src/sections/body/yoga/content/poses/ustrasana.md
@@ -146,7 +146,7 @@ template or code edits are ever needed to publish content.
 
 ## 4. Git publishing routine
 
-Day-to-day sequence (from `website/20260822`, or the repo root for the git
+Day-to-day sequence (from `website/20260910`, or the repo root for the git
 commands; content edits live under the site folder):
 
 ```bash

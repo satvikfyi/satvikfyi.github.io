@@ -21,22 +21,22 @@ dietNotes: Rich and unctuous, nourishing for vāta and pitta in cool weather, bu
 ingredients:
   - item: coconut (fresh grated)
     quantity: ¾ cup
-  - item: cashews
+  - item: 'cashew'
     quantity: 10
-  - item: poppy seeds
+  - item: 'khus khus (poppy seed)'
     quantity: 1 tsp
     note: optional
   - item: ghee
     quantity: 2 tbsp
   - item: cumin seeds
     quantity: 1 tsp
-  - item: cardamom pods
+  - item: 'green cardamom'
     quantity: 2
   - item: cloves
     quantity: 2
   - item: cinnamon stick
     quantity: 1 inch piece
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: green chili
@@ -45,10 +45,10 @@ ingredients:
   - item: carrot
     quantity: 1
     note: diced
-  - item: beans (green)
+  - item: 'green bean'
     quantity: 8
     note: cut into 1-inch pieces
-  - item: peas (green)
+  - item: 'green peas'
     quantity: ½ cup
   - item: water
     quantity: 1 cup

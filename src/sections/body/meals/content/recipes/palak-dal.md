@@ -22,7 +22,8 @@ seasonalSuitability:
   - all-year
 dietNotes: Asafoetida stands in for garlic's digestiveness while keeping the dish satvik; a pinch is enough.
 ingredients:
-  - item: toor dal (split pigeon peas)
+  - item: 'toor dal'
+    note: "split pigeon peas"
     quantity: ¾ cup
   - item: water
     quantity: 3 cups
@@ -38,9 +39,9 @@ ingredients:
     quantity: 1 tbsp
   - item: cumin seeds
     quantity: 1 tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: coriander powder

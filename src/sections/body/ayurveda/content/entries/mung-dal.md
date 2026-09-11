@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/moong-dal/"
 name: Mung Dal
 slug: mung-dal
 sanskritName: Mudga

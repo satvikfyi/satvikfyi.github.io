@@ -24,7 +24,7 @@ ingredients:
   - item: green chili
     quantity: 2
     note: finely chopped
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: grated
   - item: curry leaves
@@ -34,7 +34,7 @@ ingredients:
     quantity: ½ tsp
   - item: turmeric powder
     quantity: ¼ tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
   - item: lemon
     quantity: 1 tsp

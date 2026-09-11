@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/green-cardamom/"
 name: Cardamom
 slug: cardamom
 sanskritName: Elā

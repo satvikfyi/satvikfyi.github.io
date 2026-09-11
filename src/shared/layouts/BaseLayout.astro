@@ -8,7 +8,7 @@ import Meta from '../seo/Meta.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import SiteFooter from '../components/SiteFooter.astro';
 import { SITE } from '../../config/site';
-import { isModuleEnabled } from '../../config/sections';
+import { isModuleEnabled, enabledModules, pillars } from '../../config/sections';
 import type { JsonLdObject } from '../seo/jsonld';
 
 interface Props {
@@ -18,27 +18,72 @@ interface Props {
   path: string;
   type?: 'website' | 'article';
   noindex?: boolean;
+  /** Exclude from the Pagefind index without noindex (migration stubs keep canonical + indexable). */
+  searchExclude?: boolean;
+  /** Canonical URL override, absolute; used by migration stubs pointing at the entry's new home. */
+  canonicalUrl?: string;
+  /** When set, emits a meta-refresh to this URL in <head> (soft-redirect stubs). */
+  metaRefreshTo?: string;
   jsonLd?: JsonLdObject[];
   /** Absolute social-share image URL, passed through to Meta. */
   image?: string;
 }
 
-const { title, description, path, type, noindex, jsonLd = [], image } = Astro.props;
+const {
+  title,
+  description,
+  path,
+  type,
+  noindex,
+  searchExclude = false,
+  canonicalUrl,
+  metaRefreshTo,
+  jsonLd = [],
+  image,
+} = Astro.props;
+
+/**
+ * Section label for the Pagefind index (search result eyebrow), derived
+ * from the owning module's route prefix, else the pillar, else "Pages".
+ */
+function searchSection(pagePath: string): string {
+  const module = enabledModules(undefined)
+    .filter((m) => pagePath.startsWith(m.routePrefix))
+    .sort((a, b) => b.routePrefix.length - a.routePrefix.length)[0];
+  if (module && module.id !== 'search') return module.title;
+  const pillar = pillars
+    .filter((p) => pagePath.startsWith(p.routePrefix))
+    .sort((a, b) => b.routePrefix.length - a.routePrefix.length)[0];
+  return pillar ? pillar.title : 'Pages';
+}
+
+const section = searchSection(path);
 ---
 
 <!doctype html>
-<html lang={SITE.locale}>
+<html lang={SITE.locale} data-pagefind-ignore={noindex || searchExclude ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <Meta title={title} description={description} path={path} type={type} noindex={noindex} image={image} />
+    <Meta
+      title={title}
+      description={description}
+      path={path}
+      type={type}
+      noindex={noindex}
+      image={image}
+      canonicalUrl={canonicalUrl}
+      metaRefreshTo={metaRefreshTo}
+    />
     {isModuleEnabled('blog') && <link rel="alternate" type="application/rss+xml" title={`${SITE.name}, Blog`} href="/rss.xml" />}
     {jsonLd.map((obj) => <script is:inline type="application/ld+json" set:html={JSON.stringify(obj)} />)}
   </head>
   <body class="flex min-h-screen flex-col bg-cream font-sans text-earth antialiased">
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <SiteHeader currentPath={path} />
-    <main id="main-content" class="flex-1">
+    <!-- data-pagefind-body: only this landmark is indexed; header/footer chrome never leaks into results. Pagefind ignores metadata outside the body element, so section/description ride along here. -->
+    <main id="main-content" class="flex-1" data-pagefind-body data-pagefind-meta={`section:${section}`}>
+      {description && <span hidden data-pagefind-meta="description">{description}</span>}
       <slot />
     </main>
     <SiteFooter />

@@ -17,6 +17,7 @@ import DoshaChips from '../components/DoshaChips.astro';
 import { recipeJsonLd } from '../lib/jsonld';
 import config from '../module.config';
 import { mealTypeLabel, satvikTagLabel, seasonLabel } from '../lib/domain';
+import { ingredientEntryMap, wikiIngredientHref } from '../../../../shared/lib/ingredientBridge';
 import '../styles/print.css';
 
 export async function getStaticPaths() {
@@ -38,6 +39,8 @@ const recipe = entry.data;
 const { Content } = await render(entry);
 const hasBody = typeof entry.body === 'string' && entry.body.trim().length > 0;
 const path = `/body/meals/recipes/${recipe.slug}/`;
+// Forward half of the recipe ↔ wiki link (shared bridge, one map per build).
+const ingredientWiki = await ingredientEntryMap();
 
 const timeText = [
   recipe.prepTime > 0 ? `${recipe.prepTime} min prep` : null,
@@ -87,12 +90,29 @@ const timeText = [
         <h2 id="ingredients-heading" class="font-display text-2xl font-bold text-earth">Ingredients</h2>
         <ul role="list" class="mt-4 grid grid-cols-1 gap-x-8 gap-y-2 rounded-2xl border border-sand bg-parchment/60 p-6 sm:grid-cols-2 print:grid-cols-1">
           {
-            recipe.ingredients.map((ingredient) => (
-              <li class="text-sm leading-relaxed text-earth">
-                <span class="font-semibold">{ingredient.quantity ? `${ingredient.quantity} ` : ''}{ingredient.item}</span>
-                {ingredient.note && <span class="text-clay">, {ingredient.note}</span>}
-              </li>
-            ))
+            recipe.ingredients.map((ingredient) => {
+              // Canonical items with a wiki ingredient entry link to it;
+              // items without an entry stay plain text.
+              const wikiEntry = ingredientWiki.get(ingredient.item);
+              return (
+                <li class="text-sm leading-relaxed text-earth">
+                  <span class="font-semibold">
+                    {ingredient.quantity ? `${ingredient.quantity} ` : ''}
+                    {wikiEntry ? (
+                      <a
+                        href={wikiIngredientHref(wikiEntry)}
+                        class="underline decoration-saffron/60 underline-offset-2 hover:decoration-saffron-deep print:no-underline"
+                      >
+                        {ingredient.item}
+                      </a>
+                    ) : (
+                      ingredient.item
+                    )}
+                  </span>
+                  {ingredient.note && <span class="text-clay">, {ingredient.note}</span>}
+                </li>
+              );
+            })
           }
         </ul>
       </section>

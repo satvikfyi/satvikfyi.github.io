@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/tulsi/"
 name: Holy Basil
 slug: tulsi
 sanskritName: Tulasī

@@ -1,8 +1,9 @@
 ---
 /**
  * Search page, the server renders the input, a results region and a
- * no-JS fallback (browse via pillars); the island fetches the merged index
- * and runs Fuse.js. Routed via src/pages/search/index.astro.
+ * no-JS fallback (browse via pillars); the island loads the Pagefind
+ * runtime from /pagefind/ (built after `astro build`) and searches the
+ * whole rendered site. Routed via src/pages/search/index.astro.
  */
 import PageLayout from '../../../../shared/layouts/PageLayout.astro';
 import { websiteJsonLd, breadcrumbJsonLd } from '../../../../shared/seo/jsonld';

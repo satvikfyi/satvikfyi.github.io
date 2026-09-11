@@ -20,7 +20,8 @@ seasonalSuitability:
   - monsoon
 dietNotes: Goda masala (Maharashtrian garam masala) is the soul of amti, kalmasala works too. Kokum can stand in for the tamarind.
 ingredients:
-  - item: toor dal (split pigeon peas)
+  - item: 'toor dal'
+    note: "split pigeon peas"
     quantity: ¾ cup
   - item: water
     quantity: 3 cups
@@ -34,7 +35,7 @@ ingredients:
     quantity: ½ tsp
   - item: curry leaves
     quantity: 8
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
   - item: goda masala
     quantity: 1½ tsp

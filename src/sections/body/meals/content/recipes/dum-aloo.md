@@ -26,7 +26,7 @@ ingredients:
   - item: tomato
     quantity: 2
     note: pureed or finely chopped
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 2 tbsp
     note: grated
   - item: ghee
@@ -38,20 +38,20 @@ ingredients:
   - item: black cardamom
     quantity: 1
     note: cracked
-  - item: cardamom pods
+  - item: 'green cardamom'
     quantity: 2
   - item: cloves
     quantity: 3
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: 8
     note: coarsely crushed
-  - item: bay leaf
+  - item: 'tej patta (Indian bay leaf)'
     quantity: 1
   - item: red chili powder
     quantity: ½ tsp
   - item: coriander powder
     quantity: 1 tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
   - item: water
     quantity: 1 cup
@@ -64,7 +64,7 @@ ingredients:
     quantity: 2 tbsp
     note: chopped
 steps:
-  - Warm the ghee in a heavy pot; add the cumin seeds, cinnamon, black cardamom, cardamom, cloves, pepper and bay leaf, and let them perfume the fat for a minute.
+  - Warm the ghee in a heavy pot; add the cumin seeds, cinnamon, black cardamom, cardamom, cloves, pepper and tej patta, and let them perfume the fat for a minute.
   - Add the ginger and fry 30 seconds, then the hing, chili powder and coriander powder.
   - Add the tomato with a splash of water and cook 5–6 minutes until it breaks down into a glossy gravy.
   - Add the parboiled potatoes and the cup of water with salt; cover and simmer 10–12 minutes, stirring once, until the gravy clings to the cubes.

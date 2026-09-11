@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/amla/"
 name: Amla
 slug: amla
 sanskritName: Āmalakī

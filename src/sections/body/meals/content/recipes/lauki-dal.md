@@ -38,9 +38,9 @@ ingredients:
     quantity: 1 tbsp
   - item: cumin seeds
     quantity: 1 tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: rock salt

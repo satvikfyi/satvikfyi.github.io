@@ -23,7 +23,7 @@ ingredients:
   - item: garlic
     quantity: 3 cloves
     note: optional, sliced
-  - item: red chili
+  - item: 'dry red chili'
     quantity: 2
     note: whole dried, broken
   - item: oil

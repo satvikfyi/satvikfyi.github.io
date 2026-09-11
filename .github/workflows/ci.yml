@@ -1,10 +1,10 @@
 # Quality gate for every push / PR to main.
 #
-# NOTE: GitHub only reads workflows from the repository root's .github/
-# directory. This file lives at website/20260822/.github/ per the spec's
-# canonical layout (the folder is designed to be its own site repository).
-# If the site stays nested inside satvikfyi_assets, move this file to the
-# repo root and add `defaults: { run: { working-directory: website/20260822 } }`.
+# Deployment model (decision-log 18): the live site runs from its own
+# repository, whose root holds the contents of this website build folder
+# (delivered as <build>.zip from the satvikfyi_assets repo). There, this
+# workflow sits at the repo root and runs as-is. The assets repo itself
+# does not build or deploy.
 name: CI
 
 on:
@@ -35,13 +35,13 @@ jobs:
       - name: Type & schema check (astro check)
         run: npm run check
 
-      - name: Build
+      - name: Build (includes the Pagefind indexing step)
         run: npm run build
 
       - name: Internal link check
         run: npm run check:links
 
-      - name: Search index check (size budget + validity)
+      - name: Pagefind index check
         run: npm run check:search
 
       - name: SEO check (canonical, og:image, JSON-LD, robots, sitemap)

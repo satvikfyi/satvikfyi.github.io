@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/turmeric/"
 name: Turmeric
 slug: turmeric
 sanskritName: Haridrā

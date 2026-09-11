@@ -25,7 +25,7 @@ ingredients:
   - item: moong dal (split yellow)
     quantity: 1 cup
     note: soaked 3–4 hours
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: green chili

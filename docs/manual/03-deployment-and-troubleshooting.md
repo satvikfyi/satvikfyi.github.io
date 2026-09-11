@@ -5,46 +5,36 @@ back when something reaches production that should not have.
 
 ## 1. Hosting & CI/CD
 
-### The pipeline (as designed)
+### Two repositories, two jobs
 
-GitHub Pages hosts the static output. Two workflows are provisioned in
-`website/20260822/.github/workflows/`:
+- **The live website repository** hosts the site on GitHub Pages. Its
+  root is the content of this website build folder. Both workflows ship
+  inside the build (`.github/workflows/`) and run there from the repo
+  root as-is, with no working-directory tweaks.
+- **`satvikfyi_assets`** (this folder's home) is the archive: recipes,
+  prompts, decisions, and the website as per-build zip artifacts. It
+  does not build or deploy anything.
 
-- **CI** (`ci.yml`): on every push/PR to main, runs `npm run check`,
-  `npm run build`, the three content gates (links, search index, SEO) and
+Shipping a build to live = unzip the build's zip into the live repo's
+root, commit, push. The zip is built from inside the website folder so
+its contents land at the live repo's root directly.
+
+### The pipeline
+
+- **CI** (`ci.yml`): on every push/PR to main in the live repo, runs
+  `npm run check`, `npm run build` (which includes the Pagefind indexing
+  step), the three content gates (links, search index, SEO) and
   Lighthouse CI (performance ≥ 0.90, accessibility ≥ 0.95).
 - **Deploy** (`deploy.yml`): on push to main (or manual dispatch), builds
-  with `npm ci && npm run build` and publishes `dist/` to GitHub Pages.
+  and publishes `dist/` to GitHub Pages.
 
 `public/CNAME` pins the custom domain **satvik.fyi**; the sitemap lands at
 `/sitemap-index.xml` and RSS at `/rss.xml`.
 
-### One-time activation checklist (do this before launch)
+### One-time activation checklist (in the live repo, before first deploy)
 
-**GitHub only reads workflows from the repository root's `.github/`
-folder.** The site currently lives at `website/20260822/` inside the
-`satvikfyi_assets` repository, so as shipped, the workflows will not run
-until they are moved to the root and pointed at the site folder:
-
-1. Copy both workflows to the repo root:
-   ```bash
-   cd satvikfyi_assets
-   mkdir -p .github/workflows
-   cp website/20260822/.github/workflows/{ci,deploy}.yml .github/workflows/
-   ```
-2. In each workflow's steps that run npm, add a working directory (and
-   adjust the artifact path in deploy.yml):
-   ```yaml
-   defaults:
-     run:
-       working-directory: website/20260822
-   # and in deploy.yml, the upload step becomes:
-   #   - uses: actions/upload-pages-artifact@v3
-   #     with:
-   #       path: website/20260822/dist
-   ```
-3. Repository settings: **Settings → Pages → Source: GitHub Actions**.
-4. DNS at the registrar, for the apex domain `satvik.fyi`:
+1. Repository settings: **Settings → Pages → Source: GitHub Actions**.
+2. DNS at the registrar, for the apex domain `satvik.fyi`:
    ```text
    A     @     185.199.108.153
    A     @     185.199.109.153
@@ -52,14 +42,33 @@ until they are moved to the root and pointed at the site folder:
    A     @     185.199.111.153
    CNAME www   <your-github-username>.github.io
    ```
-5. Settings → Pages → Custom domain: `satvik.fyi`, then enable
+3. Settings → Pages → Custom domain: `satvik.fyi`, then enable
    **Enforce HTTPS** once the certificate issues (usually minutes).
-6. Verify DNS propagation: `dig satvik.fyi +short` should list the four
+4. Verify DNS propagation: `dig satvik.fyi +short` should list the four
    A records.
 
 After activation, every push to main deploys; PRs run CI without deploying.
 Until then (or instead), publish manually with the same commands the
 workflow runs: `npm ci && npm run build` and upload `dist/`.
+
+### Creating a build zip (handoff / archive)
+
+From inside the website build folder — the zip's contents must land at
+the live repo's root, so the archive root IS the site:
+
+```bash
+cd satvikfyi_assets/website/<build>
+zip -qr ../../<build>.zip . \
+  -x "node_modules/*" -x "dist/*" -x ".astro/*" -x ".lighthouseci/*" \
+  -x "*.log" -x ".DS_Store"
+```
+
+The zip must include the dotfiles — `.github/workflows/` (the site is
+incomplete for live without them) and `.gitignore`. Commit the zip to
+`satvikfyi_assets`; the open `website/` folder is gitignored there by
+design. Renaming a build folder means updating the archive-side scripts
+(`content/scripts/*.py`) and the docs path references — search the repo
+for the old folder name before and after.
 
 ## 2. Build error resolution
 
@@ -99,9 +108,11 @@ URL. Markdown bodies may link to module listings and fixed routes across
 modules, and to detail pages only within the same module; anything else
 fails when a module is disabled. Fix: point at the listing page.
 
-**Search gate** (`merged index is over the budget`): content grew past
-300 KB of index. Fix: trim keyword lists in the search index builder or
-split a collection; the gate exists to protect the search page's weight.
+**Search gate** (`dist/pagefind/pagefind.js is missing`): pagefind did
+not run after the build. Fix: build with `npm run build` (the script runs
+`pagefind --site dist`; pagefind comes from `npm ci`). If search works in
+`npm run preview` but the page says the index cannot load under
+`npm run dev`, that is expected: the index only exists after a build.
 
 **SEO gate** (`N page(s) lack og:image` / missing JSON-LD): almost always
 means a page was hand-added outside the layouts. Fix: use the shared

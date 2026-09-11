@@ -31,7 +31,7 @@ ingredients:
   - item: cumin powder
     quantity: ½ tsp
     note: dry-roasted
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: ½ tsp
     note: grated
   - item: curry leaves

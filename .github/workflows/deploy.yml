@@ -1,14 +1,14 @@
 # Build and publish the site to GitHub Pages on every push to main.
 #
-# Requires (one-time, per repository): Settings → Pages → Source set to
-# "GitHub Actions". The CNAME file in public/ pins the custom domain
-# satvik.fyi; point the domain's DNS at GitHub Pages as documented in
-# docs/decision-log.md.
+# Deployment model (decision-log 18): the live site runs from its own
+# repository, whose root holds the contents of this website build folder
+# (delivered as <build>.zip from the satvikfyi_assets repo); there this
+# workflow runs from the repo root as-is.
 #
-# NOTE: same repo-root caveat as ci.yml if this folder stays nested inside
-# satvikfyi_assets — move to the repo root and set
-# `working-directory: website/20260822` plus `path: website/20260822/dist`
-# on the upload step.
+# Requires (one-time, in the live repo): Settings -> Pages -> Source set
+# to "GitHub Actions". The CNAME file in public/ pins the custom domain
+# satvik.fyi; DNS records are documented in
+# docs/manual/03-deployment-and-troubleshooting.md.
 name: Deploy to GitHub Pages
 
 on:
@@ -41,7 +41,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
+      - name: Build (includes the Pagefind indexing step)
         run: npm run build
 
       - name: Upload Pages artifact

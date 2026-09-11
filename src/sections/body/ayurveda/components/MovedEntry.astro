@@ -1,0 +1,44 @@
+---
+/**
+ * MovedEntry, the soft-redirect stub for ayurveda entries that now live
+ * in the wiki (docs/unified-wiki.md, migration-stub flavor): meta-refresh
+ * for humans, canonical to the wiki URL for search equity — deliberately
+ * NOT noindex, since noindex would forfeit the canonical's consolidation —
+ * and excluded from the Pagefind index so it never duplicates its target.
+ */
+import BaseLayout from '../../../../shared/layouts/BaseLayout.astro';
+import { SITE } from '../../../../config/site';
+
+interface Props {
+  name: string;
+  summary: string;
+  /** Absolute path of the stub page itself, e.g. "/body/ayurveda/ghee/". */
+  path: string;
+  /** Site-relative URL of the wiki entry, e.g. "/wiki/ingredients/ghee/". */
+  movedTo: string;
+}
+
+const { name, summary, path, movedTo } = Astro.props;
+const absoluteTarget = movedTo.startsWith('http') ? movedTo : new URL(movedTo, SITE.url).href;
+---
+
+<BaseLayout
+  title={`${name}, now in the wiki`}
+  description={`${name} has moved to the site wiki.`}
+  path={path}
+  canonicalUrl={absoluteTarget}
+  searchExclude={true}
+  metaRefreshTo={movedTo}
+>
+  <div class="mx-auto flex max-w-2xl flex-col items-center px-4 py-24 text-center">
+    <p class="text-xs font-semibold tracking-wide text-sage-deep uppercase">This entry has moved</p>
+    <h1 class="mt-2 font-display text-3xl font-bold text-earth">{name} now lives in the wiki</h1>
+    <p class="mt-4 text-sm leading-relaxed text-clay">{summary}</p>
+    <a
+      href={movedTo}
+      class="mt-6 rounded-xl bg-sage-deep px-5 py-2.5 text-sm font-semibold text-cream transition-colors hover:bg-earth"
+    >
+      Open the wiki entry
+    </a>
+  </div>
+</BaseLayout>

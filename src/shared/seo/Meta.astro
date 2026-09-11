@@ -14,15 +14,28 @@ interface Props {
   noindex?: boolean;
   /** Absolute social-share image URL; enables summary_large_image cards. */
   image?: string;
+  /** Canonical URL override (absolute); used by migration stubs pointing at content's new home. */
+  canonicalUrl?: string;
+  /** When set, emits a meta-refresh to this URL (soft-redirect stubs). */
+  metaRefreshTo?: string;
 }
 
-const { title, description = SITE.description, path, type = 'website', noindex = false, image } = Astro.props;
+const {
+  title,
+  description = SITE.description,
+  path,
+  type = 'website',
+  noindex = false,
+  image,
+  canonicalUrl,
+  metaRefreshTo,
+} = Astro.props;
 
 const normalizedPath = path === '' ? '/' : path.startsWith('/') ? path : `/${path}`;
 const canonicalPath = normalizedPath.endsWith('/') || /\.[a-z0-9]+$/i.test(normalizedPath)
   ? normalizedPath
   : `${normalizedPath}/`;
-const canonical = `${SITE.url}${canonicalPath}`;
+const canonical = canonicalUrl ?? `${SITE.url}${canonicalPath}`;
 const pageTitle = title ? `${title} · ${SITE.name}` : SITE.title;
 // OpenGraph default: every page gets the branded image unless it brings its own.
 const ogImage = image ?? `${SITE.url}/assets/og-default.png`;
@@ -31,6 +44,7 @@ const ogImage = image ?? `${SITE.url}/assets/og-default.png`;
 <title>{pageTitle}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
+{metaRefreshTo && <meta http-equiv="refresh" content={`0; url=${metaRefreshTo}`} />}
 {noindex ? <meta name="robots" content="noindex, nofollow" /> : <meta name="robots" content="index, follow" />}
 
 <meta property="og:site_name" content={SITE.name} />

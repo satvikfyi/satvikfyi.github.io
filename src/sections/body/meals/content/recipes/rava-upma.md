@@ -33,7 +33,7 @@ ingredients:
   - item: curry leaves
     quantity: 8
     note: fresh
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: green chili
@@ -42,7 +42,7 @@ ingredients:
   - item: carrot
     quantity: 1
     note: diced small
-  - item: peas (green)
+  - item: 'green peas'
     quantity: ¼ cup
   - item: water
     quantity: 2½ cups

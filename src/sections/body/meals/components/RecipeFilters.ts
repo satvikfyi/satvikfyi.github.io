@@ -1,13 +1,15 @@
 /**
- * RecipeFilters island, client-side filtering of the server-rendered
- * recipe grid. Self-contained vanilla TS: no framework. The grid is fully
- * rendered in HTML, so without JavaScript every recipe is visible; this
- * script only toggles visibility.
+ * RecipeFilters island, client-side filtering and sorting of the
+ * server-rendered recipe grid. Self-contained vanilla TS: no framework.
+ * The grid is fully rendered in HTML (alphabetically by default), so
+ * without JavaScript every recipe is visible in a stable order; this
+ * script only toggles visibility and re-orders cards.
  *
  * Supports deep links: /body/meals/?dosha=vata&meal=breakfast&season=…
- * With no ?dosha= in the URL, a saved dosha-quiz result (shared store,
- * written by the /quiz/ module) quietly becomes the default, reading the
- * shared store is the sanctioned integration point between modules.
+ * plus &sort=title|time|time-desc. With no ?dosha= in the URL, a saved
+ * dosha-quiz result (shared store, written by the /quiz/ module)
+ * quietly becomes the default, reading the shared store is the
+ * sanctioned integration point between modules.
  */
 import { createStore } from '../../../../shared/utils/localStorageStore';
 import { isDosha } from '../lib/domain';
@@ -26,6 +28,15 @@ const PARAM_KEYS: Record<keyof FilterState, string> = {
   meal: 'meal',
   season: 'season',
   tag: 'tag',
+};
+
+type CardSorter = (a: HTMLElement, b: HTMLElement) => number;
+
+/** Sort orders offered by the #filter-sort select; 'title' is the default. */
+const SORTERS: Record<string, CardSorter> = {
+  title: (a, b) => (a.dataset.title ?? '').localeCompare(b.dataset.title ?? '', 'en'),
+  time: (a, b) => Number(a.dataset.time ?? 0) - Number(b.dataset.time ?? 0),
+  'time-desc': (a, b) => Number(b.dataset.time ?? 0) - Number(a.dataset.time ?? 0),
 };
 
 function cardMatches(card: HTMLElement, state: FilterState): boolean {
@@ -55,6 +66,7 @@ export function mountFilters(panel: HTMLElement | null): void {
   const grid = document.getElementById('recipe-grid');
   const count = document.getElementById('recipe-count');
   const clear = document.getElementById('filter-clear') as HTMLButtonElement | null;
+  const sortSelect = document.getElementById('filter-sort') as HTMLSelectElement | null;
   if (!grid || !count) return;
 
   const selects: Record<keyof FilterState, HTMLSelectElement | null> = {
@@ -66,6 +78,12 @@ export function mountFilters(panel: HTMLElement | null): void {
 
   const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-recipe-card]'));
   const total = cards.length;
+
+  /** Re-append the cards in the selected order; hidden cards keep their state. */
+  const applySort = (): void => {
+    const sorter = SORTERS[sortSelect?.value ?? 'title'] ?? SORTERS.title;
+    grid.append(...cards.sort(sorter));
+  };
 
   const readState = (): FilterState => ({
     dosha: selects.dosha?.value ?? '',
@@ -96,6 +114,7 @@ export function mountFilters(panel: HTMLElement | null): void {
     for (const key of Object.keys(PARAM_KEYS) as (keyof FilterState)[]) {
       if (state[key]) params.set(PARAM_KEYS[key], state[key]);
     }
+    if (sortSelect && sortSelect.value !== 'title') params.set('sort', sortSelect.value);
     const query = params.toString();
     const nextUrl = `${window.location.pathname}${query ? `?${query}` : ''}`;
     window.history.replaceState(null, '', nextUrl);
@@ -122,9 +141,19 @@ export function mountFilters(panel: HTMLElement | null): void {
     }
   }
 
+  // Sort deep link (?sort=time); clearing filters never touches the sort.
+  const urlSort = params.get('sort');
+  if (sortSelect && urlSort && SORTERS[urlSort]) {
+    sortSelect.value = urlSort;
+  }
+
   for (const select of Object.values(selects)) {
     select?.addEventListener('change', apply);
   }
+  sortSelect?.addEventListener('change', () => {
+    applySort();
+    apply();
+  });
   clear?.addEventListener('click', () => {
     for (const select of Object.values(selects)) {
       if (select) select.value = '';
@@ -134,6 +163,7 @@ export function mountFilters(panel: HTMLElement | null): void {
   });
 
   panel.hidden = false;
+  applySort();
   apply();
 
   if (quizApplied) {

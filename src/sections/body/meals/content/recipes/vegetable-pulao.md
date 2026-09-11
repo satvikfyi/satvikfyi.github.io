@@ -27,24 +27,24 @@ ingredients:
     quantity: 2 tbsp
   - item: cumin seeds
     quantity: 1 tsp
-  - item: cardamom pods
+  - item: 'green cardamom'
     quantity: 3
   - item: cloves
     quantity: 3
   - item: cinnamon stick
     quantity: 1 inch piece
-  - item: bay leaf
+  - item: 'tej patta (Indian bay leaf)'
     quantity: 1
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tbsp
     note: julienned
   - item: carrot
     quantity: 1
     note: diced
-  - item: beans (green)
+  - item: 'green bean'
     quantity: 8
     note: cut into 1-inch pieces
-  - item: peas (green)
+  - item: 'green peas'
     quantity: ½ cup
   - item: water
     quantity: 1¾ cups

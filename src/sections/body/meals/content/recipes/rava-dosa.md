@@ -31,10 +31,10 @@ ingredients:
     quantity: 2½ cups
   - item: cumin seeds
     quantity: 1 tsp
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: ½ tsp
     note: coarsely crushed
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
   - item: curry leaves
     quantity: 6
@@ -42,7 +42,7 @@ ingredients:
   - item: green chili
     quantity: 1
     note: optional, finely chopped
-  - item: ginger (fresh)
+  - item: 'ginger'
     quantity: 1 tsp
     note: grated
   - item: rock salt

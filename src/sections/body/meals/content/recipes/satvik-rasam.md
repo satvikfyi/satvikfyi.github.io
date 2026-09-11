@@ -37,11 +37,11 @@ ingredients:
     quantity: ½ tsp
   - item: cumin seeds
     quantity: ½ tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
   - item: curry leaves
     quantity: 6
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: ½ tsp
     note: coarsely ground
   - item: cumin powder

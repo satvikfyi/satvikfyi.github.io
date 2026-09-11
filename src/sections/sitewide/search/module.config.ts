@@ -1,11 +1,13 @@
 import type { ModuleSectionConfig } from '../../../config/module';
 
 /**
- * Search module (Phase 5, sitewide); the discovery layer. Build-time JSON
- * indexes are generated from every enabled module's collection (consumed
- * via the public content-collection API, no module internals), plus the
- * registry's own pages. The /search/ page ships a self-contained Fuse.js
- * island that fetches the merged index once and then works offline.
+ * Search module (Phase 5, sitewide); the discovery layer. Pagefind
+ * indexes the rendered site after every build (`pagefind --site dist`
+ * is appended to `npm run build`), so full page content — recipe
+ * ingredients, steps, prose — is searchable. The /search/ page ships a
+ * self-contained island that loads the Pagefind runtime from
+ * /pagefind/ once and then works offline. New modules need no search
+ * wiring: their rendered pages are indexed automatically.
  */
 const config: ModuleSectionConfig = {
   kind: 'module',

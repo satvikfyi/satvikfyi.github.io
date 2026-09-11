@@ -1,4 +1,5 @@
 ---
+movedTo: "/wiki/ingredients/fennel/"
 name: Fennel
 slug: fennel
 sanskritName: Miśreya

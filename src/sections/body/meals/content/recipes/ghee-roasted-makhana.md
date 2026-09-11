@@ -24,7 +24,7 @@ ingredients:
     quantity: 2 cups
   - item: ghee
     quantity: 2 tsp
-  - item: black pepper
+  - item: 'black peppercorns'
     quantity: ¼ tsp
     note: coarsely ground
   - item: rock salt

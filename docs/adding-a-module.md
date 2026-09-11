@@ -93,6 +93,18 @@ thin wrapper pattern. Keep the registry guard so disabling a module
 degrades cleanly (redirect to the parent pillar, sitemap entry already
 filtered via `disabledRoutePrefixes`).
 
+### 5b. Pick the listing's default order deliberately
+
+Every listing ships with a deliberate, explainable order (decision-log
+18): **group by a meaningful facet with A–Z inside** for small
+collections (yoga by pose category, pranayama by level), **flat
+alphabetical** once the collection grows past ~40–50 items or has no
+meaningful facet (meals, wiki). Add a client-side sort control only
+when scale or a second sort key justifies it (meals: `?sort=` with
+quickest/longest via `data-title`/`data-time` attributes on cards).
+Blogs stay newest-first; that is the correct default for time-ordered
+content, not an oversight.
+
 ### 6. Interactivity = islands, self-contained
 
 If the module needs client behaviour (filters, planner, quiz), write it as

@@ -18,7 +18,7 @@ seasonalSuitability:
   - all-year
 dietNotes: Phulkas are dry-roasted with barely any ghee, lighter than paratha; the sabzi changes with the season.
 ingredients:
-  - item: wheat flour (atta)
+  - item: 'atta (whole wheat flour)'
     quantity: 1 cup
     note: wholemeal, plus extra for dusting
   - item: water
@@ -33,9 +33,9 @@ ingredients:
     quantity: ½ tsp
   - item: turmeric powder
     quantity: ⅛ tsp
-  - item: asafoetida (hing)
+  - item: 'hing (asafoetida)'
     quantity: 1 pinch
-  - item: mixed vegetables
+  - item: 'mixed vegetable'
     quantity: 2 cups
     note: seasonal, e.g. carrot, beans, peas, or lauki, potato, cabbage
   - item: coriander powder
